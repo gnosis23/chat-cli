@@ -9,9 +9,10 @@
 	},
 	"scripts": {
 		"start": "node dist/cli.js",
-		"build": "babel --out-dir=dist source",
-		"dev": "babel --out-dir=dist --watch source",
-		"test": "prettier --check . && xo && ava"
+		"build": "babel --out-dir=dist src",
+		"dev": "babel --out-dir=dist --watch src",
+		"test": "prettier --check . && xo && ava",
+		"format": "prettier --write src/**/*.{js,jsx}"
 	},
 	"files": [
 		"dist"
