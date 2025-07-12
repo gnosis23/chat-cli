@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {useInput, useApp, Box, Text} from 'ink';
+import Spinner from 'ink-spinner';
 
 export default function ChatApp() {
 	const {exit} = useApp();
@@ -11,6 +12,7 @@ export default function ChatApp() {
 	]);
 	const [currentInput, setCurrentInput] = useState('');
 	const [isComposing, setIsComposing] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	useInput((input, key) => {
 		if (key.ctrl && input === 'c') {
@@ -24,6 +26,9 @@ export default function ChatApp() {
 					...messages,
 					{type: 'user', text: currentInput.trim()},
 				];
+				setLoading(true);
+				setMessages(newMessages);
+				setCurrentInput('');
 
 				// 添加机器人回复 (TODO)
 				const finalMessages = [
@@ -31,8 +36,10 @@ export default function ChatApp() {
 					{type: 'bot', text: 'TODO: ' + currentInput.trim()},
 				];
 
-				setMessages(finalMessages);
-				setCurrentInput('');
+				setTimeout(() => {
+					setMessages(finalMessages);
+					setLoading(false);
+				}, 2000);
 			}
 		} else if (key.backspace || key.delete) {
 			setCurrentInput(prev => prev.slice(0, -1));
@@ -45,7 +52,7 @@ export default function ChatApp() {
 		const colors = {
 			user: 'blue',
 			bot: 'white',
-			system: 'gray',
+			system: 'white',
 		};
 
 		const prefixes = {
@@ -76,22 +83,31 @@ export default function ChatApp() {
 			{/* 消息历史 */}
 			<Box flexDirection="column" flexGrow={1} marginBottom={1}>
 				{messages.map((message, index) => renderMessage(message, index))}
+				{loading && (
+					<Box marginBottom={1}>
+						<Text color="white">
+							<Spinner type="dots" /> 正在思考...
+						</Text>
+					</Box>
+				)}
 			</Box>
 
 			{/* 输入框 */}
-			<Box borderStyle="single" borderColor="gray">
-				<Text color="yellow"> {'>'} </Text>
-				<Text>
-					{currentInput}
-					<Text backgroundColor="white" color="black">
-						{' '}
+			{!loading && (
+				<Box borderStyle="single" borderColor="white">
+					<Text color="yellow"> {'>'} </Text>
+					<Text>
+						{currentInput}
+						<Text backgroundColor="white" color="black">
+							{' '}
+						</Text>
 					</Text>
-				</Text>
-			</Box>
+				</Box>
+			)}
 
 			{/* 提示信息 */}
-			<Box marginTop={1}>
-				<Text color="gray" dimColor>
+			<Box>
+				<Text color="white" dimColor>
 					按 Enter 发送消息 | 按 Ctrl+C 退出
 				</Text>
 			</Box>
