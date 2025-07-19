@@ -7,11 +7,10 @@ export default function ChatApp() {
 	const [messages, setMessages] = useState([
 		{
 			type: 'system',
-			text: '欢迎使用聊天应用！输入消息后按Enter发送，按Ctrl+C退出。',
+			text: 'Welcome to the chat cli! Type a message and press Enter to send, press Ctrl+C to exit.',
 		},
 	]);
 	const [currentInput, setCurrentInput] = useState('');
-	const [isComposing, setIsComposing] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	useInput((input, key) => {
@@ -21,7 +20,7 @@ export default function ChatApp() {
 
 		if (key.return) {
 			if (currentInput.trim()) {
-				// 添加用户消息
+				// Add user message
 				const newMessages = [
 					...messages,
 					{type: 'user', text: currentInput.trim()},
@@ -30,7 +29,7 @@ export default function ChatApp() {
 				setMessages(newMessages);
 				setCurrentInput('');
 
-				// 添加机器人回复 (TODO)
+				// Add bot reply (TODO)
 				const finalMessages = [
 					...newMessages,
 					{type: 'bot', text: 'TODO: ' + currentInput.trim()},
@@ -73,26 +72,26 @@ export default function ChatApp() {
 
 	return (
 		<Box flexDirection="column" height="100%">
-			{/* 标题 */}
-			<Box marginBottom={1}>
+			{/* Title */}
+			<Box marginTop={2} marginBottom={2}>
 				<Text bold color="cyan">
-					🗨️ 聊天对话应用
+					🗨️ Chat Cli
 				</Text>
 			</Box>
 
-			{/* 消息历史 */}
+			{/* Message history */}
 			<Box flexDirection="column" flexGrow={1} marginBottom={1}>
 				{messages.map((message, index) => renderMessage(message, index))}
 				{loading && (
 					<Box marginBottom={1}>
 						<Text color="white">
-							<Spinner type="dots" /> 正在思考...
+							<Spinner type="dots" /> Thinking...
 						</Text>
 					</Box>
 				)}
 			</Box>
 
-			{/* 输入框 */}
+			{/* Input box */}
 			{!loading && (
 				<Box borderStyle="single" borderColor="white">
 					<Text color="yellow"> {'>'} </Text>
@@ -105,10 +104,10 @@ export default function ChatApp() {
 				</Box>
 			)}
 
-			{/* 提示信息 */}
-			<Box>
+			{/* Help text */}
+			<Box marginBottom={1}>
 				<Text color="white" dimColor>
-					按 Enter 发送消息 | 按 Ctrl+C 退出
+					Press Enter to send message | Press Ctrl+C to exit
 				</Text>
 			</Box>
 		</Box>
