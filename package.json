@@ -1,14 +1,14 @@
 {
-	"name": "ink-app",
-	"version": "0.0.0",
+	"name": "chat-cli",
+	"version": "0.1.0",
 	"license": "MIT",
-	"bin": "dist/cli.js",
+	"bin": "dist/chat-cli.js",
 	"type": "module",
 	"engines": {
 		"node": ">=16"
 	},
 	"scripts": {
-		"start": "node dist/cli.js",
+		"start": "node dist/chat-cli.js",
 		"build": "babel --out-dir=dist src",
 		"dev": "babel --out-dir=dist --watch src",
 		"test": "prettier --check . && xo && ava",

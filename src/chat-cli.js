@@ -8,13 +8,6 @@ const cli = meow(
 	`
 		Usage
 		  $ ink-app
-
-		Options
-			--name  Your name
-
-		Examples
-		  $ ink-app --name=Jane
-		  Hello, Jane
 	`,
 	{
 		importMeta: import.meta,
