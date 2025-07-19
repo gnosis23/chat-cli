@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useInput, useApp, Box, Text} from 'ink';
+import {useInput, useApp, Box, Text, Static} from 'ink';
 import Spinner from 'ink-spinner';
 import {useAIChat} from './hooks/use-ai-chat.js';
 import {AIMessage, LoadingIndicator, ErrorMessage} from './components/ai-message.js';
@@ -102,8 +102,10 @@ export default function ChatApp({ config = {} }) {
 			</Box>
 
 			{/* Message history */}
-			<Box flexDirection="column" flexGrow={1} marginBottom={1}>
-				{messages.map((message, index) => renderMessage(message, index))}
+			<Box marginBottom={1} minWidth={120}>
+				<Static items={messages}>
+					{(item, index) => renderMessage(item, index)}
+				</Static>
 				{streamingMessage && (
 					<AIMessage message={streamingMessage} isStreaming={true} />
 				)}

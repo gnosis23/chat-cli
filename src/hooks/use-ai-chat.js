@@ -1,5 +1,5 @@
 import {useState, useCallback} from 'react';
-import {streamText} from 'ai';
+import {streamText, smoothStream} from 'ai';
 import {createOpenAI} from '@ai-sdk/openai';
 
 export const useAIChat = (config = {}) => {
@@ -31,6 +31,10 @@ export const useAIChat = (config = {}) => {
 					})),
 					temperature: config.temperature || 0.7,
 					maxTokens: config.maxTokens || 1000,
+					experimental_transform: smoothStream({
+						delayInMs: 500, // optional: defaults to 10ms
+						chunking: 'line', // optional: defaults to 'word'
+					}),
 				});
 
 				let fullMessage = '';
