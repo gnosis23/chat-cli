@@ -7,12 +7,9 @@ export const AIMessage = ({message, isStreaming = false}) => {
 	return (
 		<Box flexDirection="column" marginBottom={1}>
 			<Box>
-				<Text color="cyan" bold>
-					🤖 AI:
-				</Text>
 				{isStreaming && (
-					<Text color="gray" italic>
-						typing...
+					<Text color="gray" italic marginLeft={1}>
+						🤖 AI: typing...
 					</Text>
 				)}
 			</Box>
