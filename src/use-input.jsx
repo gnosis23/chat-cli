@@ -1,44 +1,66 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useInput, useApp, Box, Text} from 'ink';
 import Spinner from 'ink-spinner';
+import {useAIChat} from './hooks/use-ai-chat.js';
+import {AIMessage, LoadingIndicator, ErrorMessage} from './components/ai-message.js';
 
-export default function ChatApp() {
+export default function ChatApp({ config = {} }) {
 	const {exit} = useApp();
 	const [messages, setMessages] = useState([
 		{
 			type: 'system',
-			text: 'Welcome to the chat cli! Type a message and press Enter to send, press Ctrl+C to exit.',
+			text: 'Welcome to the AI chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
+		},
+		{
+			type: 'system',
+			text: 'AI assistance enabled with DeepSeek integration.',
 		},
 	]);
 	const [currentInput, setCurrentInput] = useState('');
-	const [loading, setLoading] = useState(false);
+	const [streamingMessage, setStreamingMessage] = useState('');
+	
+	const {
+		sendMessage,
+		cancelMessage,
+		streamingMessage: aiStreamingMessage,
+		isLoading,
+		error,
+	} = useAIChat(config);
+
+	useEffect(() => {
+		if (aiStreamingMessage !== null) {
+			setStreamingMessage(aiStreamingMessage);
+		} else {
+			setStreamingMessage('');
+		}
+	}, [aiStreamingMessage]);
 
 	useInput((input, key) => {
 		if (key.ctrl && input === 'c') {
-			exit();
+			if (isLoading) {
+				cancelMessage();
+			} else {
+				exit();
+			}
+			return;
 		}
 
 		if (key.return) {
 			if (currentInput.trim()) {
-				// Add user message
-				const newMessages = [
-					...messages,
-					{type: 'user', text: currentInput.trim()},
-				];
-				setLoading(true);
-				setMessages(newMessages);
+				const userMessage = {type: 'user', text: currentInput.trim()};
+				const updatedMessages = [...messages, userMessage];
+				setMessages(updatedMessages);
 				setCurrentInput('');
 
-				// Add bot reply (TODO)
-				const finalMessages = [
-					...newMessages,
-					{type: 'bot', text: 'TODO: ' + currentInput.trim()},
-				];
-
-				setTimeout(() => {
-					setMessages(finalMessages);
-					setLoading(false);
-				}, 2000);
+				sendMessage(updatedMessages, (chunk, fullMessage) => {
+					// Streaming updates handled by useEffect
+				}).then((fullResponse) => {
+					if (fullResponse) {
+						setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
+					}
+				}).catch((err) => {
+					// Error handled by useAIChat hook
+				});
 			}
 		} else if (key.backspace || key.delete) {
 			setCurrentInput(prev => prev.slice(0, -1));
@@ -82,17 +104,21 @@ export default function ChatApp() {
 			{/* Message history */}
 			<Box flexDirection="column" flexGrow={1} marginBottom={1}>
 				{messages.map((message, index) => renderMessage(message, index))}
-				{loading && (
+				{streamingMessage && (
+					<AIMessage message={streamingMessage} isStreaming={true} />
+				)}
+				{isLoading && !streamingMessage && (
 					<Box marginBottom={1}>
 						<Text color="white">
 							<Spinner type="dots" /> Thinking...
 						</Text>
 					</Box>
 				)}
+				{error && <ErrorMessage error={error} />}
 			</Box>
 
 			{/* Input box */}
-			{!loading && (
+			{!isLoading && (
 				<Box borderStyle="single" borderColor="white">
 					<Text color="yellow"> {'>'} </Text>
 					<Text>
@@ -107,7 +133,7 @@ export default function ChatApp() {
 			{/* Help text */}
 			<Box marginBottom={1}>
 				<Text color="white" dimColor>
-					Press Enter to send message | Press Ctrl+C to exit
+					{isLoading ? 'Press Ctrl+C to cancel' : 'Press Enter to send | Press Ctrl+C to exit'}
 				</Text>
 			</Box>
 		</Box>
