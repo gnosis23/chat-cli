@@ -78,7 +78,7 @@ export default function ChatApp({ config = {} }) {
 
 		const prefixes = {
 			user: '> ',
-			bot: '. ',
+			bot: '⏺ ',
 			system: '💡 ',
 		};
 
