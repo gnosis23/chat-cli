@@ -49,11 +49,12 @@ node dist/chat-cli.js
 src/
 ├── app.js          # Main React component wrapper
 ├── chat-cli.js     # CLI entry point with Ink rendering
-├── use-input.jsx   # Core chat application component
+├── chat.jsx        # Core chat application component
+├── constant.js     # Application constants
 ├── components/     # Reusable UI components
-│   └── ai-message.jsx
+│   └── ai-message.jsx  # AI message display component
 └── hooks/          # Custom React hooks
-    └── use-ai-chat.js
+    └── use-ai-chat.js  # AI chat state management
 ```
 
 ## Technical Details
@@ -68,6 +69,11 @@ src/
 
 Once running, simply type your message and press Enter to send. The AI bot will respond with simulated messages. Use Ctrl+C to exit.
 
+**Available Commands:**
+- Type regular messages to chat with the AI
+- Use `/clear` to clear the chat history
+- Use `/help` to display available commands
+
 ## Development
 
 ### Prerequisites
@@ -76,8 +82,8 @@ Once running, simply type your message and press Enter to send. The AI bot will 
 
 ### Setup
 ```bash
-git clone <repository-url>
-cd ink-app
+git clone https://github.com/gnosis23/chat-cli.git
+cd chat-cli
 npm install
 npm run dev
 ```
