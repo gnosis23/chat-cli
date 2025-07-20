@@ -77,17 +77,19 @@ export default function ChatApp({ config = {} }) {
 		};
 
 		const prefixes = {
-			user: '> ',
-			bot: '⏺ ',
-			system: '💡 ',
+			user: '>',
+			bot: '⏺',
+			system: '*',
 		};
 
 		return (
-			<Box key={index} marginBottom={1}>
-				<Text color={colors[message.type]}>
-					{prefixes[message.type]}
-					{message.text}
-				</Text>
+			<Box key={index} display="flex" marginBottom={1}>
+				<Text>{prefixes[message.type]}</Text>
+				<Box flexDirection="column" paddingLeft={2} paddingRight={2}>
+					<Text color={colors[message.type]}>
+						{message.text}
+					</Text>
+				</Box>
 			</Box>
 		);
 	};
