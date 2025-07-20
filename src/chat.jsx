@@ -93,14 +93,7 @@ export default function ChatApp({ config = {} }) {
 	};
 
 	return (
-		<Box flexDirection="column" height="100%">
-			{/* Title */}
-			<Box marginTop={2} marginBottom={2}>
-				<Text bold color="cyan">
-					🗨️ Chat Cli
-				</Text>
-			</Box>
-
+		<Box flexDirection="column" gap={0}>
 			{/* Message history */}
 			<Box marginBottom={1} minWidth={120}>
 				<Static items={messages}>
