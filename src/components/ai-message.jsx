@@ -1,12 +1,13 @@
 import React from 'react';
 import {Box, Text} from 'ink';
+import {GAP_SIZE} from '../constant.js';
 
 export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
 	if (!message) return null;
 
 	return (
 		<Box flexDirection="column" marginBottom={1}>
-			<Box gap={2}>
+			<Box gap={GAP_SIZE}>
 				{isStreaming && (
 					<>
 						<Text color="gray">⏺</Text>
@@ -19,7 +20,7 @@ export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
 					</>
 				)}
 			</Box>
-			<Box marginLeft={2}>
+			<Box marginLeft={GAP_SIZE}>
 				{!isStreaming && <Text color="white">{message}</Text>}
 			</Box>
 		</Box>

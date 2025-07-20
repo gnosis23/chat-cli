@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useInput, useApp, Box, Text, Static} from 'ink';
 import Spinner from 'ink-spinner';
+import {GAP_SIZE} from './constant.js';
 import {useAIChat} from './hooks/use-ai-chat.js';
 import {AIMessage, LoadingIndicator, ErrorMessage} from './components/ai-message.js';
 
@@ -86,7 +87,7 @@ export default function ChatApp({ config = {} }) {
 		return (
 			<Box key={index} display="flex" marginBottom={1}>
 				<Text>{prefixes[message.type]}</Text>
-				<Box flexDirection="column" paddingLeft={2} paddingRight={2}>
+				<Box flexDirection="column" paddingLeft={GAP_SIZE} paddingRight={GAP_SIZE}>
 					<Text color={colors[message.type]}>
 						{message.text}
 					</Text>
@@ -106,7 +107,7 @@ export default function ChatApp({ config = {} }) {
 					<AIMessage message={streamingMessage} isStreaming={true} tokenCount={streamingTokenCount} />
 				)}
 				{isLoading && !streamingMessage && (
-					<Box gap={2} marginBottom={1}>
+					<Box gap={GAP_SIZE} marginBottom={1}>
 						<Text color="white"><Spinner type="dots" /></Text>
 						<Text color="white">
 							Thinking...
