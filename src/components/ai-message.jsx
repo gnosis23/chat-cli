@@ -1,6 +1,6 @@
 import React from 'react';
 import {Box, Text} from 'ink';
-import {GAP_SIZE} from '../constant.js';
+import {GAP_SIZE, PRIMARY_COLOR} from '../constant.js';
 
 export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
 	if (!message) return null;
@@ -11,8 +11,11 @@ export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
 				{isStreaming && (
 					<>
 						<Text color="gray">⏺</Text>
-						<Text color="gray" italic marginLeft={1}>
-							typing...
+						<Text color={PRIMARY_COLOR} italic marginLeft={1}>
+							typing
+							{tokenCount % 4 < 1 ? ' ' : '.'}
+							{tokenCount % 4 < 2 ? ' ' : '.'}
+							{tokenCount % 4 < 3 ? ' ' : '.'}
 						</Text>
 						<Text color="gray" italic marginLeft={1}>
 							({tokenCount} tokens)
