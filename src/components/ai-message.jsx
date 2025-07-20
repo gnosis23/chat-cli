@@ -1,25 +1,26 @@
 import React from 'react';
 import {Box, Text} from 'ink';
 
-export const AIMessage = ({message, isStreaming = false}) => {
+export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
 	if (!message) return null;
 
 	return (
 		<Box flexDirection="column" marginBottom={1}>
-			<Box>
+			<Box gap={2}>
 				{isStreaming && (
-					<Text color="gray" italic marginLeft={1}>
-						🤖 AI: typing...
-					</Text>
+					<>
+						<Text color="gray">⏺</Text>
+						<Text color="gray" italic marginLeft={1}>
+							typing...
+						</Text>
+						<Text color="gray" italic marginLeft={1}>
+							({tokenCount} tokens)
+						</Text>
+					</>
 				)}
 			</Box>
 			<Box marginLeft={2}>
-				<Text color="white">{message}</Text>
-				{isStreaming && (
-					<Text color="yellow" bold>
-						█
-					</Text>
-				)}
+				{!isStreaming && <Text color="white">{message}</Text>}
 			</Box>
 		</Box>
 	);

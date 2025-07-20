@@ -4,6 +4,7 @@ import {createOpenAI} from '@ai-sdk/openai';
 
 export const useAIChat = (config = {}) => {
 	const [streamingMessage, setStreamingMessage] = useState(null);
+	const [streamingTokenCount, setStreamingTokenCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 
@@ -21,6 +22,7 @@ export const useAIChat = (config = {}) => {
 			setIsLoading(true);
 			setError(null);
 			setStreamingMessage('');
+			setStreamingTokenCount(0);
 
 			try {
 				const result = streamText({
@@ -40,7 +42,10 @@ export const useAIChat = (config = {}) => {
 				let fullMessage = '';
 				for await (const textPart of result.textStream) {
 					fullMessage += textPart;
-					setStreamingMessage(fullMessage);
+					// Estimate tokens: roughly 4 characters per token
+					const estimatedTokens = Math.ceil(fullMessage.length / 4);
+					setStreamingTokenCount(estimatedTokens);
+					setStreamingMessage(fullMessage); // Still store full message but won't display it
 					onChunk?.(textPart, fullMessage);
 				}
 
@@ -51,6 +56,7 @@ export const useAIChat = (config = {}) => {
 			} finally {
 				setIsLoading(false);
 				setStreamingMessage(null);
+				setStreamingTokenCount(0);
 			}
 		},
 		[deepseek, model, config, isLoading],
@@ -59,6 +65,7 @@ export const useAIChat = (config = {}) => {
 	const cancelMessage = useCallback(() => {
 		setIsLoading(false);
 		setStreamingMessage(null);
+		setStreamingTokenCount(0);
 		setError('Message cancelled by user');
 	}, []);
 
@@ -66,6 +73,7 @@ export const useAIChat = (config = {}) => {
 		sendMessage,
 		cancelMessage,
 		streamingMessage,
+		streamingTokenCount,
 		isLoading,
 		error,
 	};

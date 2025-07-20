@@ -23,6 +23,7 @@ export default function ChatApp({ config = {} }) {
 		sendMessage,
 		cancelMessage,
 		streamingMessage: aiStreamingMessage,
+		streamingTokenCount,
 		isLoading,
 		error,
 	} = useAIChat(config);
@@ -102,12 +103,13 @@ export default function ChatApp({ config = {} }) {
 					{(item, index) => renderMessage(item, index)}
 				</Static>
 				{streamingMessage && (
-					<AIMessage message={streamingMessage} isStreaming={true} />
+					<AIMessage message={streamingMessage} isStreaming={true} tokenCount={streamingTokenCount} />
 				)}
 				{isLoading && !streamingMessage && (
-					<Box marginBottom={1}>
+					<Box gap={2} marginBottom={1}>
+						<Text color="white"><Spinner type="dots" /></Text>
 						<Text color="white">
-							<Spinner type="dots" /> Thinking...
+							Thinking...
 						</Text>
 					</Box>
 				)}
