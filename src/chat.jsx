@@ -3,7 +3,8 @@ import {useInput, useApp, Box, Text, Static} from 'ink';
 import Spinner from 'ink-spinner';
 import {GAP_SIZE} from './constant.js';
 import {useAIChat} from './hooks/use-ai-chat.js';
-import {AIMessage, LoadingIndicator, ErrorMessage} from './components/ai-message.js';
+import {AIMessage, ErrorMessage} from './components/ai-message.js';
+import {HistoryMessage} from './components/history-message.js';
 
 export default function ChatApp({ config = {} }) {
 	const {exit} = useApp();
@@ -71,37 +72,12 @@ export default function ChatApp({ config = {} }) {
 		}
 	});
 
-	const renderMessage = (message, index) => {
-		const colors = {
-			user: 'blue',
-			bot: 'white',
-			system: 'white',
-		};
-
-		const prefixes = {
-			user: '>',
-			bot: '⏺',
-			system: '*',
-		};
-
-		return (
-			<Box key={index} display="flex" marginBottom={1}>
-				<Text>{prefixes[message.type]}</Text>
-				<Box flexDirection="column" paddingLeft={GAP_SIZE} paddingRight={GAP_SIZE}>
-					<Text color={colors[message.type]}>
-						{message.text}
-					</Text>
-				</Box>
-			</Box>
-		);
-	};
-
 	return (
 		<Box flexDirection="column" gap={0}>
 			{/* Message history */}
 			<Box marginBottom={1} minWidth={120}>
 				<Static items={messages}>
-					{(item, index) => renderMessage(item, index)}
+					{(item, index) => <HistoryMessage key={index} message={item} index={index} />}
 				</Static>
 				{streamingMessage && (
 					<AIMessage message={streamingMessage} isStreaming={true} tokenCount={streamingTokenCount} />

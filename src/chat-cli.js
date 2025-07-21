@@ -4,6 +4,8 @@ import {render} from 'ink';
 import meow from 'meow';
 import App from './app.js';
 
+console.log('\n');
+
 const cli = meow(
 	`
 		Usage
