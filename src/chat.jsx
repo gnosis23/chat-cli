@@ -3,8 +3,8 @@ import {useInput, useApp, Box, Text, Static} from 'ink';
 import Spinner from 'ink-spinner';
 import {GAP_SIZE} from './constant.js';
 import {useAIChat} from './hooks/use-ai-chat.js';
-import {AIMessage, ErrorMessage} from './components/ai-message.js';
-import {HistoryMessage} from './components/history-message.js';
+import {AIMessage, ErrorMessage} from './components/ai-message.jsx';
+import {HistoryMessage} from './components/history-message.jsx';
 
 export default function ChatApp({ config = {} }) {
 	const {exit} = useApp();

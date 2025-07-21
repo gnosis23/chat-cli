@@ -1,8 +1,7 @@
-#!/usr/bin/env node
 import React from 'react';
 import {render} from 'ink';
 import meow from 'meow';
-import App from './app.js';
+import App from './app.jsx';
 
 console.log('\n');
 
@@ -43,4 +42,4 @@ const cli = meow(
 	},
 );
 
-render(<App config={cli.flags} />);
+render(React.createElement(App, {config: cli.flags}));

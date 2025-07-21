@@ -1,6 +1,5 @@
 import React from 'react';
 import {Box, Text} from 'ink';
-import Markdown from 'ink-markdown';
 import dedent from 'dedent';
 import {GAP_SIZE} from '../constant.js';
 
@@ -20,7 +19,7 @@ export const HistoryMessage = ({message, index}) => {
 				paddingLeft={GAP_SIZE}
 				paddingRight={GAP_SIZE}
 			>
-				<Markdown>{text}</Markdown>
+				<Text>{text}</Text>
 			</Box>
 		</Box>
 	);
