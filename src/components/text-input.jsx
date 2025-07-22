@@ -18,15 +18,16 @@ export default function TextInput({
 			const displayLines = lines.length > 0 ? lines : [''];
 			const cursorLineIndex = getCursorLineIndex();
 			const cursorLinePosition = getCursorLinePosition();
-			
+
 			return displayLines.map((line, index) => {
 				const isCursorLine = index === cursorLineIndex;
-				
+
 				if (isCursorLine) {
 					const beforeCursor = line.slice(0, cursorLinePosition);
-					const cursorChar = line.slice(cursorLinePosition, cursorLinePosition + 1) || ' ';
+					const cursorChar =
+						line.slice(cursorLinePosition, cursorLinePosition + 1) || ' ';
 					const afterCursor = line.slice(cursorLinePosition + 1);
-					
+
 					return (
 						<Text key={index}>
 							{beforeCursor}
@@ -37,14 +38,14 @@ export default function TextInput({
 						</Text>
 					);
 				}
-				
+
 				return <Text key={index}>{line || ' '}</Text>;
 			});
 		} else {
 			const beforeCursor = value.slice(0, cursorPosition);
 			const cursorChar = value.slice(cursorPosition, cursorPosition + 1) || ' ';
 			const afterCursor = value.slice(cursorPosition + 1);
-			
+
 			return (
 				<Text>
 					{prefix}

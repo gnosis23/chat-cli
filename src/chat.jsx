@@ -7,7 +7,7 @@ import {AIMessage, ErrorMessage} from './components/ai-message.jsx';
 import {HistoryMessage} from './components/history-message.jsx';
 import TextInput from './components/text-input.jsx';
 
-export default function ChatApp({ config = {} }) {
+export default function ChatApp({config = {}}) {
 	const {exit} = useApp();
 	const [messages, setMessages] = useState([
 		{
@@ -21,7 +21,7 @@ export default function ChatApp({ config = {} }) {
 	]);
 	const [currentInput, setCurrentInput] = useState('');
 	const [streamingMessage, setStreamingMessage] = useState('');
-	
+
 	const {
 		sendMessage,
 		cancelMessage,
@@ -31,7 +31,7 @@ export default function ChatApp({ config = {} }) {
 		error,
 	} = useAIChat(config);
 
-	const handleSubmit = (inputText) => {
+	const handleSubmit = inputText => {
 		if (inputText.trim()) {
 			const userMessage = {type: 'user', text: inputText.trim()};
 			const updatedMessages = [...messages, userMessage];
@@ -40,13 +40,15 @@ export default function ChatApp({ config = {} }) {
 
 			sendMessage(updatedMessages, (chunk, fullMessage) => {
 				// Streaming updates handled by useEffect
-			}).then((fullResponse) => {
-				if (fullResponse) {
-					setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
-				}
-			}).catch((err) => {
-				// Error handled by useAIChat hook
-			});
+			})
+				.then(fullResponse => {
+					if (fullResponse) {
+						setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
+					}
+				})
+				.catch(err => {
+					// Error handled by useAIChat hook
+				});
 		}
 	};
 
@@ -74,17 +76,23 @@ export default function ChatApp({ config = {} }) {
 			{/* Message history */}
 			<Box marginBottom={1} minWidth={120}>
 				<Static items={messages}>
-					{(item, index) => <HistoryMessage key={index} message={item} index={index} />}
+					{(item, index) => (
+						<HistoryMessage key={index} message={item} index={index} />
+					)}
 				</Static>
 				{streamingMessage && (
-					<AIMessage message={streamingMessage} isStreaming={true} tokenCount={streamingTokenCount} />
+					<AIMessage
+						message={streamingMessage}
+						isStreaming={true}
+						tokenCount={streamingTokenCount}
+					/>
 				)}
 				{isLoading && !streamingMessage && (
 					<Box gap={GAP_SIZE} marginBottom={1}>
-						<Text color="white"><Spinner type="dots" /></Text>
 						<Text color="white">
-							Thinking...
+							<Spinner type="dots" />
 						</Text>
+						<Text color="white">Thinking...</Text>
 					</Box>
 				)}
 				{error && <ErrorMessage error={error} />}
@@ -101,7 +109,9 @@ export default function ChatApp({ config = {} }) {
 			{/* Help text */}
 			<Box marginBottom={1}>
 				<Text color="white" dimColor>
-					{isLoading ? 'Press Ctrl+C to cancel' : 'Press Enter to send | Press Ctrl+C to exit | Arrow keys to navigate'}
+					{isLoading
+						? 'Press Ctrl+C to cancel'
+						: 'Press Enter to send | Press Ctrl+C to exit | Arrow keys to navigate'}
 				</Text>
 			</Box>
 		</Box>

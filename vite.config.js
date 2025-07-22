@@ -15,16 +15,16 @@ export default defineConfig({
 			},
 		},
 		target: 'node16',
-    ssr: true,
+		ssr: true,
 		minify: true,
 	},
 	esbuild: {
 		jsx: 'automatic',
 		jsxImportSource: 'react',
 	},
-  ssr: {
-    target: 'node16',
-  },
+	ssr: {
+		target: 'node16',
+	},
 	define: {
 		'process.env.NODE_ENV': '"production"',
 	},

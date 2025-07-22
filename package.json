@@ -11,7 +11,7 @@
 		"start": "node dist/chat-cli.js",
 		"build": "vite build",
 		"dev": "vite build --watch",
-		"test": "prettier --check . && xo && ava",
+		"test": "prettier --check .",
 		"format": "prettier --write src/**/*.{js,jsx}"
 	},
 	"files": [

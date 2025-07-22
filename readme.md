@@ -14,21 +14,23 @@ A terminal-based AI chat application built with [Ink](https://github.com/vadimde
 ## Quick Start
 
 ### Development Mode
+
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Build and watch for changes
-npm run dev
+pnpm run dev
 
 # In another terminal, run the CLI
-npm start
+pnpm start
 ```
 
 ### Production Build
+
 ```bash
 # Build the project
-npm run build
+pnpm run build
 
 # Run the built CLI
 node dist/chat-cli.js
@@ -36,13 +38,13 @@ node dist/chat-cli.js
 
 ## Development Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Transpile JSX to `dist/` |
-| `npm run dev` | Build with watch mode |
-| `npm start` | Run built CLI |
-| `npm test` | Run prettier, linting, and tests |
-| `npm run format` | Auto-fix formatting |
+| Command           | Description                      |
+| ----------------- | -------------------------------- |
+| `pnpm run build`  | Transpile JSX to `dist/`         |
+| `pnpm run dev`    | Build with watch mode            |
+| `pnpm start`      | Run built CLI                    |
+| `pnpm test`       | Run prettier, linting, and tests |
+| `pnpm run format` | Auto-fix formatting              |
 
 ## Project Structure
 
@@ -65,11 +67,13 @@ src/
 The chat interface includes a sophisticated text input component with full keyboard navigation:
 
 ### Cursor Navigation
+
 - **Arrow Keys**: Move cursor left/right
 - **Ctrl+F / Ctrl+B**: Forward/backward character (Emacs-style)
 - **Ctrl+Left/Right**: Move by word boundaries
 
 ### Text Editing Shortcuts
+
 - **Ctrl+A**: Move to beginning of line
 - **Ctrl+E**: Move to end of line
 - **Ctrl+U**: Clear to start of line
@@ -81,6 +85,7 @@ The chat interface includes a sophisticated text input component with full keybo
 - **Backspace/Delete**: Standard character deletion
 
 ### Multi-line Input (when enabled)
+
 - **Shift+Enter**: Insert new line
 - **Up/Down Arrow**: Navigate between lines
 
@@ -97,12 +102,14 @@ The chat interface includes a sophisticated text input component with full keybo
 Once running, simply type your message and press Enter to send. The AI bot will respond with simulated messages.
 
 **Basic Commands:**
+
 - Type regular messages to chat with the AI
 - Press **Enter** to send a message
 - Use **Ctrl+C** to exit the application
 - Use **Ctrl+C** during AI response to cancel
 
 **Keyboard Shortcuts:**
+
 - All standard text editing shortcuts work in the input field
 - Arrow keys for cursor navigation
 - Emacs-style keybindings (Ctrl+A, Ctrl+E, etc.)
@@ -110,25 +117,28 @@ Once running, simply type your message and press Enter to send. The AI bot will 
 ## Development
 
 ### Prerequisites
+
 - Node.js 16 or higher
-- npm
+- pnpm
 
 ### Setup
+
 ```bash
 git clone https://github.com/gnosis23/chat-cli.git
 cd chat-cli
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run linter only
-npx xo
+pnpm xo
 
 # Run formatter
-npm run format
+pnpm run format
 ```

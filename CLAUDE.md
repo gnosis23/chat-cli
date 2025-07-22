@@ -24,6 +24,7 @@ src/
 ### State Management
 
 The chat app uses React hooks for state:
+
 - `messages`: Array of chat messages with types (system/user/bot)
 - `currentInput`: Current text input
 - `loading`: Loading state for bot responses
@@ -32,6 +33,7 @@ The chat app uses React hooks for state:
 ## Development Commands
 
 ### Build & Run
+
 ```bash
 npm run build          # Transpile JSX to dist/
 npm run dev           # Build with watch mode
@@ -39,17 +41,20 @@ npm start            # Run built CLI
 ```
 
 ### Testing & Linting
+
 ```bash
 npm test             # Run prettier, xo linting, and ava tests
 npm run format       # Auto-fix prettier formatting
 ```
 
 ### Manual Testing
+
 ```bash
 node dist/chat-cli.js  # Run built CLI directly
 ```
 
 ## Testing Framework
+
 - **AVA**: Test runner with JSX support via import-jsx
 - **ink-testing-library**: For testing Ink component rendering
 - **Current tests**: Basic greeting tests in test.js (may need updates for chat functionality)
@@ -63,6 +68,7 @@ node dist/chat-cli.js  # Run built CLI directly
 - **Formatting**: Prettier with @vdemedes/prettier-config
 
 ## File Structure Notes
+
 - Source files in `src/` are ES modules with JSX
 - Built files output to `dist/` (ignored in git)
 - `chat-cli.js` is the executable entry point after build
