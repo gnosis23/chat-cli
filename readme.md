@@ -8,7 +8,8 @@ A terminal-based AI chat application built with [Ink](https://github.com/vadimde
 - **Real-time Messaging**: Send messages and receive bot responses
 - **Message History**: Persistent chat history during session
 - **Loading States**: Visual feedback while processing responses
-- **Keyboard Navigation**: Full keyboard support for seamless interaction
+- **Advanced Text Input**: Full keyboard shortcuts and cursor navigation
+- **Multi-line Support**: Shift+Enter for new lines (when enabled)
 
 ## Quick Start
 
@@ -47,15 +48,41 @@ node dist/chat-cli.js
 
 ```
 src/
-├── app.js          # Main React component wrapper
-├── chat-cli.js     # CLI entry point with Ink rendering
-├── chat.jsx        # Core chat application component
-├── constant.js     # Application constants
-├── components/     # Reusable UI components
-│   └── ai-message.jsx  # AI message display component
-└── hooks/          # Custom React hooks
-    └── use-ai-chat.js  # AI chat state management
+├── app.js               # Main React component wrapper
+├── chat-cli.js          # CLI entry point with Ink rendering
+├── chat.jsx             # Core chat application component
+├── constant.js          # Application constants
+├── components/          # Reusable UI components
+│   ├── ai-message.jsx   # AI message display component
+│   ├── history-message.jsx  # Message history component
+│   └── text-input.jsx   # Advanced text input with keyboard shortcuts
+└── hooks/               # Custom React hooks
+    └── use-ai-chat.js   # AI chat state management
 ```
+
+## Advanced Text Input Features
+
+The chat interface includes a sophisticated text input component with full keyboard navigation:
+
+### Cursor Navigation
+- **Arrow Keys**: Move cursor left/right
+- **Ctrl+F / Ctrl+B**: Forward/backward character (Emacs-style)
+- **Ctrl+Left/Right**: Move by word boundaries
+
+### Text Editing Shortcuts
+- **Ctrl+A**: Move to beginning of line
+- **Ctrl+E**: Move to end of line
+- **Ctrl+U**: Clear to start of line
+- **Ctrl+K**: Clear to end of line
+- **Ctrl+W**: Delete previous word
+- **Ctrl+D**: Delete character at cursor
+- **Ctrl+H**: Backspace
+- **Ctrl+L**: Clear entire line
+- **Backspace/Delete**: Standard character deletion
+
+### Multi-line Input (when enabled)
+- **Shift+Enter**: Insert new line
+- **Up/Down Arrow**: Navigate between lines
 
 ## Technical Details
 
@@ -67,12 +94,18 @@ src/
 
 ## Usage
 
-Once running, simply type your message and press Enter to send. The AI bot will respond with simulated messages. Use Ctrl+C to exit.
+Once running, simply type your message and press Enter to send. The AI bot will respond with simulated messages.
 
-**Available Commands:**
+**Basic Commands:**
 - Type regular messages to chat with the AI
-- Use `/clear` to clear the chat history
-- Use `/help` to display available commands
+- Press **Enter** to send a message
+- Use **Ctrl+C** to exit the application
+- Use **Ctrl+C** during AI response to cancel
+
+**Keyboard Shortcuts:**
+- All standard text editing shortcuts work in the input field
+- Arrow keys for cursor navigation
+- Emacs-style keybindings (Ctrl+A, Ctrl+E, etc.)
 
 ## Development
 
