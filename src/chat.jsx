@@ -5,6 +5,7 @@ import {GAP_SIZE} from './constant.js';
 import {useAIChat} from './hooks/use-ai-chat.js';
 import {AIMessage, ErrorMessage} from './components/ai-message.jsx';
 import {HistoryMessage} from './components/history-message.jsx';
+import TextInput from './components/text-input.jsx';
 
 export default function ChatApp({ config = {} }) {
 	const {exit} = useApp();
@@ -30,6 +31,25 @@ export default function ChatApp({ config = {} }) {
 		error,
 	} = useAIChat(config);
 
+	const handleSubmit = (inputText) => {
+		if (inputText.trim()) {
+			const userMessage = {type: 'user', text: inputText.trim()};
+			const updatedMessages = [...messages, userMessage];
+			setMessages(updatedMessages);
+			setCurrentInput('');
+
+			sendMessage(updatedMessages, (chunk, fullMessage) => {
+				// Streaming updates handled by useEffect
+			}).then((fullResponse) => {
+				if (fullResponse) {
+					setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
+				}
+			}).catch((err) => {
+				// Error handled by useAIChat hook
+			});
+		}
+	};
+
 	useEffect(() => {
 		if (aiStreamingMessage !== null) {
 			setStreamingMessage(aiStreamingMessage);
@@ -46,29 +66,6 @@ export default function ChatApp({ config = {} }) {
 				exit();
 			}
 			return;
-		}
-
-		if (key.return) {
-			if (currentInput.trim()) {
-				const userMessage = {type: 'user', text: currentInput.trim()};
-				const updatedMessages = [...messages, userMessage];
-				setMessages(updatedMessages);
-				setCurrentInput('');
-
-				sendMessage(updatedMessages, (chunk, fullMessage) => {
-					// Streaming updates handled by useEffect
-				}).then((fullResponse) => {
-					if (fullResponse) {
-						setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
-					}
-				}).catch((err) => {
-					// Error handled by useAIChat hook
-				});
-			}
-		} else if (key.backspace || key.delete) {
-			setCurrentInput(prev => prev.slice(0, -1));
-		} else if (!key.ctrl && !key.meta && input) {
-			setCurrentInput(prev => prev + input);
 		}
 	});
 
@@ -94,22 +91,17 @@ export default function ChatApp({ config = {} }) {
 			</Box>
 
 			{/* Input box */}
-			{!isLoading && (
-				<Box borderStyle="single" borderColor="white">
-					<Text color="yellow"> {'>'} </Text>
-					<Text>
-						{currentInput}
-						<Text backgroundColor="white" color="black">
-							{' '}
-						</Text>
-					</Text>
-				</Box>
-			)}
+			<TextInput
+				value={currentInput}
+				onChange={setCurrentInput}
+				onSubmit={handleSubmit}
+				prefix="> "
+			/>
 
 			{/* Help text */}
 			<Box marginBottom={1}>
 				<Text color="white" dimColor>
-					{isLoading ? 'Press Ctrl+C to cancel' : 'Press Enter to send | Press Ctrl+C to exit'}
+					{isLoading ? 'Press Ctrl+C to cancel' : 'Press Enter to send | Press Ctrl+C to exit | Arrow keys to navigate'}
 				</Text>
 			</Box>
 		</Box>
