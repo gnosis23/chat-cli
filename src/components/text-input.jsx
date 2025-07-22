@@ -92,7 +92,7 @@ export default function TextInput({
 		if (multiline) {
 			setLines(value.split('\n').length > 0 ? value.split('\n') : ['']);
 		}
-		setCursorPosition(value.length);
+		// Don't reset cursor position here - let operations handle it
 	}, [value, multiline]);
 
 	useInput((input, key) => {
