@@ -1,14 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import {useInput, useApp, Box, Text, Static} from 'ink';
+import React, { useState, useEffect } from 'react';
+import { useInput, useApp, Box, Text, Static } from 'ink';
 import Spinner from 'ink-spinner';
-import {GAP_SIZE} from './constant.js';
-import {useAIChat} from './hooks/use-ai-chat.js';
-import {AIMessage, ErrorMessage} from './components/ai-message.jsx';
-import {HistoryMessage} from './components/history-message.jsx';
+import { GAP_SIZE } from './constant.js';
+import { useAIChat } from './hooks/use-ai-chat.js';
+import { AIMessage, ErrorMessage } from './components/ai-message.jsx';
+import { HistoryMessage } from './components/history-message.jsx';
 import TextInput from './components/text-input.jsx';
 
-export default function ChatApp({config = {}}) {
-	const {exit} = useApp();
+export default function ChatApp({ config = {} }) {
+	const { exit } = useApp();
 	const [messages, setMessages] = useState([
 		{
 			type: 'system',
@@ -31,9 +31,9 @@ export default function ChatApp({config = {}}) {
 		error,
 	} = useAIChat(config);
 
-	const handleSubmit = inputText => {
+	const handleSubmit = (inputText) => {
 		if (inputText.trim()) {
-			const userMessage = {type: 'user', text: inputText.trim()};
+			const userMessage = { type: 'user', text: inputText.trim() };
 			const updatedMessages = [...messages, userMessage];
 			setMessages(updatedMessages);
 			setCurrentInput('');
@@ -41,12 +41,15 @@ export default function ChatApp({config = {}}) {
 			sendMessage(updatedMessages, (chunk, fullMessage) => {
 				// Streaming updates handled by useEffect
 			})
-				.then(fullResponse => {
+				.then((fullResponse) => {
 					if (fullResponse) {
-						setMessages(prev => [...prev, {type: 'bot', text: fullResponse}]);
+						setMessages((prev) => [
+							...prev,
+							{ type: 'bot', text: fullResponse },
+						]);
 					}
 				})
-				.catch(err => {
+				.catch((err) => {
 					// Error handled by useAIChat hook
 				});
 		}

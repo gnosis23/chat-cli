@@ -1,10 +1,10 @@
 import React from 'react';
-import {Box, Text} from 'ink';
+import { Box, Text } from 'ink';
 import dedent from 'dedent';
-import {marked} from 'marked';
-import {markedTerminal} from 'marked-terminal';
+import { marked } from 'marked';
+import { markedTerminal } from 'marked-terminal';
 
-import {GAP_SIZE} from '../constant.js';
+import { GAP_SIZE } from '../constant.js';
 
 marked.use(markedTerminal({}));
 
@@ -20,7 +20,7 @@ const prefixes = {
 	system: '*',
 };
 
-export const HistoryMessage = ({message, index}) => {
+export const HistoryMessage = ({ message, index }) => {
 	const text =
 		message.type === 'bot'
 			? marked(dedent(message.text)).trim()

@@ -1,6 +1,6 @@
-import {URL} from 'url';
-import {tool} from 'ai';
-import {z} from 'zod';
+import { URL } from 'url';
+import { tool } from 'ai';
+import { z } from 'zod';
 
 async function fetchUrl(url) {
 	try {
@@ -43,9 +43,9 @@ async function fetchUrl(url) {
 		};
 	} catch (error) {
 		if (error instanceof TypeError && error.message.includes('Invalid URL')) {
-			return {url, size: 0, content: 'Invalid URL format'};
+			return { url, size: 0, content: 'Invalid URL format' };
 		}
-		return {url, size: 0, content: 'Failed to fetch url'};
+		return { url, size: 0, content: 'Failed to fetch url' };
 	}
 }
 
@@ -54,7 +54,7 @@ export const fetchTool = tool({
 	parameters: z.object({
 		url: z.string().url().describe('The URL to fetch content from'),
 	}),
-	execute: async ({url}) => {
+	execute: async ({ url }) => {
 		const result = await fetchUrl(url);
 		return {
 			url: result.url,

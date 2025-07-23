@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {useInput, Text, Box} from 'ink';
+import React, { useState, useEffect } from 'react';
+import { useInput, Text, Box } from 'ink';
 
 export default function TextInput({
 	value = '',

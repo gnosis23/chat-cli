@@ -1,8 +1,8 @@
-import {useState, useCallback} from 'react';
-import {streamText, smoothStream} from 'ai';
-import {createOpenRouter} from '@openrouter/ai-sdk-provider';
-import {fetchTool} from '../tools/fetch-tool.js';
-import {weatherTool} from '../tools/weather-tool.js';
+import { useState, useCallback } from 'react';
+import { streamText, smoothStream } from 'ai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { fetchTool } from '../tools/fetch-tool.js';
+import { weatherTool } from '../tools/weather-tool.js';
 
 export const useAIChat = (config = {}) => {
 	const [streamingMessage, setStreamingMessage] = useState(null);
@@ -31,7 +31,7 @@ export const useAIChat = (config = {}) => {
 			try {
 				const result = streamText({
 					model: openrouter.chat(model),
-					messages: messages.map(msg => ({
+					messages: messages.map((msg) => ({
 						role: msg.type === 'user' ? 'user' : 'assistant',
 						content: msg.text,
 					})),
@@ -46,14 +46,14 @@ export const useAIChat = (config = {}) => {
 						delayInMs: 500, // optional: defaults to 10ms
 						chunking: 'line', // optional: defaults to 'word'
 					}),
-					onStepFinish({text, toolCalls, toolResults, finishReason, usage}) {
+					onStepFinish({ text, toolCalls, toolResults, finishReason, usage }) {
 						console.log('---------------------------------------------------');
 						console.log('onStepFinish:');
 						console.log('text:', text);
 						console.log('toolCalls:', toolCalls);
 						console.log('toolResults:', toolResults);
 						console.log(
-							'---------------------------------------------------\n',
+							'---------------------------------------------------\n'
 						);
 					},
 				});
@@ -78,7 +78,7 @@ export const useAIChat = (config = {}) => {
 				setStreamingTokenCount(0);
 			}
 		},
-		[model, config, isLoading],
+		[model, config, isLoading]
 	);
 
 	const cancelMessage = useCallback(() => {

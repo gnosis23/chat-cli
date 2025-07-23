@@ -1,5 +1,5 @@
 import React from 'react';
-import {render} from 'ink';
+import { render } from 'ink';
 import meow from 'meow';
 import App from './app.jsx';
 
@@ -35,7 +35,7 @@ const cli = meow(
 				type: 'string',
 			},
 		},
-	},
+	}
 );
 
-render(React.createElement(App, {config: cli.flags}));
+render(React.createElement(App, { config: cli.flags }));

@@ -1,8 +1,8 @@
 import React from 'react';
-import {Box, Text} from 'ink';
-import {GAP_SIZE, PRIMARY_COLOR} from '../constant.js';
+import { Box, Text } from 'ink';
+import { GAP_SIZE, PRIMARY_COLOR } from '../constant.js';
 
-export const AIMessage = ({message, isStreaming = false, tokenCount = 0}) => {
+export const AIMessage = ({ message, isStreaming = false, tokenCount = 0 }) => {
 	if (!message) return null;
 
 	return (
@@ -38,7 +38,7 @@ export const LoadingIndicator = () => (
 	</Box>
 );
 
-export const ErrorMessage = ({error}) => (
+export const ErrorMessage = ({ error }) => (
 	<Box>
 		<Text color="red" bold>
 			❌ Error: {error}
