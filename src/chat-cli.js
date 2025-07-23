@@ -15,14 +15,13 @@ const cli = meow(
 		  --temperature  Response temperature (default: 0.7)
 		  --max-tokens   Maximum tokens in response (default: 1000)
 		  --api-key      DeepSeek API key
-		  --base-url     Custom API base URL
 	`,
 	{
 		importMeta: import.meta,
 		flags: {
 			model: {
 				type: 'string',
-				default: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+				default: 'deepseek/deepseek-chat-v3-0324',
 			},
 			temperature: {
 				type: 'number',
@@ -33,9 +32,6 @@ const cli = meow(
 				default: 1000,
 			},
 			apiKey: {
-				type: 'string',
-			},
-			baseUrl: {
 				type: 'string',
 			},
 		},
