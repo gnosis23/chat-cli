@@ -32,7 +32,12 @@ export const HistoryMessage = ({ message, index }) => {
 					paddingLeft={GAP_SIZE}
 					paddingRight={GAP_SIZE}
 				>
-					<Text color={colors.tool}>call tool [{message.toolName}]:</Text>
+					<Box>
+						<Text color={colors.tool} bold>
+							{message.toolName}
+						</Text>
+						<Text>({message.title})</Text>
+					</Box>
 					<Text color="gray">{message.text}</Text>
 				</Box>
 			</Box>

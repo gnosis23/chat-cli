@@ -65,5 +65,8 @@ export const fetchTool = tool({
 });
 
 export const fetchToolInfo = ({ url }, { size }) => {
-	return `Fetched ${size} characters from ${url}`;
+	return {
+		title: url,
+		text: `Fetched content from ${url} with size ${size} bytes.`,
+	};
 };

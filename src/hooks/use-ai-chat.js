@@ -2,7 +2,7 @@ import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { streamText } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { toolsObject, getToolInfoText } from '../tools';
+import { toolsObject, getToolResult } from '../tools';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
@@ -54,21 +54,33 @@ export const useAIChat = (config = {}) => {
 					maxSteps: 10,
 					tools: toolsObject,
 					onStepFinish({ text, toolCalls, toolResults }) {
-						// console.log('---------------------------------------------------');
-						// console.log('onStepFinish:');
-						// console.log('text:', text);
-						// console.log('toolCalls:', toolCalls);
-						// console.log('toolResults:', toolResults);
+						if (process.env.DEBUG === '1') {
+							console.log(
+								'---------------------------------------------------'
+							);
+							console.log('onStepFinish:');
+							console.log('text:', text);
+							console.log('toolCalls:', toolCalls);
+							console.log('toolResults:', toolResults);
+						}
 
 						if (toolResults.length) {
 							for (const toolResult of toolResults) {
-								const text = getToolInfoText(toolResult);
+								const result = getToolResult(toolResult);
 								setMessages((prev) => [
 									...prev,
-									{ type: 'tool', toolName: toolResult.toolName, text },
+									{
+										type: 'tool',
+										toolName: toolResult.toolName,
+										title: result.title,
+										text: result.text,
+									},
 								]);
 							}
 						}
+					},
+					onError(e) {
+						console.error(e.error);
 					},
 				});
 

@@ -6,17 +6,20 @@ export const toolsObject = {
 	weather: weatherTool,
 };
 
-export const getToolInfoText = (toolResult) => {
-	let text = null;
+export const getToolResult = (toolResult) => {
+	let result;
 	switch (toolResult.toolName) {
 		case 'fetch':
-			text = fetchToolInfo(toolResult.args, toolResult.result);
+			result = fetchToolInfo(toolResult.args, toolResult.result);
 			break;
 		case 'weather':
-			text = weatherToolInfo(toolResult.args, toolResult.result);
+			result = weatherToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
-			text = `Tool ${toolResult.toolName} executed with result: ${JSON.stringify(toolResult.result)}`;
+			result = {
+				title: `Tool ${toolResult.toolName} executed`,
+				text: JSON.stringify(toolResult.result),
+			};
 	}
-	return text;
+	return result;
 };

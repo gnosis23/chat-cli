@@ -13,5 +13,8 @@ export const weatherTool = tool({
 });
 
 export const weatherToolInfo = ({ city }, { temperature }) => {
-	return `The current temperature in ${city} is ${temperature}°C.`;
+	return {
+		title: city,
+		text: `The current temperature in ${city} is ${temperature}°C.`,
+	};
 };
