@@ -2,8 +2,7 @@ import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { streamText } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { fetchTool, fetchToolInfo } from '../tools/fetch-tool.js';
-import { weatherTool, weatherToolInfo } from '../tools/weather-tool.js';
+import { toolsObject, getToolInfoText } from '../tools';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
@@ -53,10 +52,7 @@ export const useAIChat = (config = {}) => {
 					temperature: config.temperature || 0.7,
 					maxTokens: config.maxTokens || 1000,
 					maxSteps: 10,
-					tools: {
-						fetch: fetchTool,
-						weather: weatherTool,
-					},
+					tools: toolsObject,
 					onStepFinish({ text, toolCalls, toolResults }) {
 						// console.log('---------------------------------------------------');
 						// console.log('onStepFinish:');
@@ -66,17 +62,7 @@ export const useAIChat = (config = {}) => {
 
 						if (toolResults.length) {
 							for (const toolResult of toolResults) {
-								let text = null;
-								switch (toolResult.toolName) {
-									case 'fetch':
-										text = fetchToolInfo(toolResult.args, toolResult.result);
-										break;
-									case 'weather':
-										text = weatherToolInfo(toolResult.args, toolResult.result);
-										break;
-									default:
-										text = `Tool ${toolResult.toolName} executed with result: ${JSON.stringify(toolResult.result)}`;
-								}
+								const text = getToolInfoText(toolResult);
 								setMessages((prev) => [
 									...prev,
 									{ type: 'tool', toolName: toolResult.toolName, text },
