@@ -1,0 +1,2 @@
+weather in shanghai
+fetch top 10 titles from https://news.ycombinator.com/news
