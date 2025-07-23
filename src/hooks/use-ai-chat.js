@@ -80,7 +80,9 @@ export const useAIChat = (config = {}) => {
 						}
 					},
 					onError(e) {
-						console.error(e.error);
+						if (process.env.DEBUG === '1') {
+							console.error(e.error);
+						}
 					},
 				});
 
