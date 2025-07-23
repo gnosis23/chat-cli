@@ -52,7 +52,7 @@ node dist/chat-cli.js
 src/
 ├── app.js               # Main React component wrapper
 ├── chat-cli.js          # CLI entry point with Ink rendering
-├── chat.jsx             # Core chat application component
+├── use-input.jsx        # Core chat application component
 ├── constant.js          # Application constants
 ├── components/          # Reusable UI components
 │   ├── ai-message.jsx   # AI message display component
