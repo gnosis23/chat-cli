@@ -12,7 +12,7 @@ export const AIMessage = ({ message, isStreaming = false, tokenCount = 0 }) => {
 					<>
 						<Text color="gray">⏺</Text>
 						<Text color={PRIMARY_COLOR} italic marginLeft={1}>
-							typing
+							Typing
 							{tokenCount % 4 < 1 ? ' ' : '.'}
 							{tokenCount % 4 < 2 ? ' ' : '.'}
 							{tokenCount % 4 < 3 ? ' ' : '.'}
