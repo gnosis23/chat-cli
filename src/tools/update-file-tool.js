@@ -46,8 +46,11 @@ export const updateFileToolInfo = (
 	{ filePath, content, offset, limit },
 	{ success, message, replaced }
 ) => {
+	let title = filePath;
+	if (offset) title += `, ${offset}`;
+	if (limit) title += `, ${limit}`;
 	return {
-		title: filePath,
+		title,
 		text: success
 			? `update ${filePath}\n${replaced}`
 			: `Failed to update file: ${message}`,
