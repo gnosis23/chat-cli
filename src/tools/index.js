@@ -2,12 +2,14 @@ import { fetchTool, fetchToolInfo } from './fetch-tool.js';
 import { weatherTool, weatherToolInfo } from './weather-tool.js';
 import { bashTool, bashToolInfo } from './bash-tool.js';
 import { readFileTool, readFileToolInfo } from './read-file-tool.js';
+import { writeFileTool, writeFileToolInfo } from './write-file-tool.js';
 
 export const toolsObject = {
 	fetch: fetchTool,
 	weather: weatherTool,
 	bash: bashTool,
 	readFile: readFileTool,
+	writeFile: writeFileTool,
 };
 
 export const getToolResult = (toolResult) => {
@@ -24,6 +26,9 @@ export const getToolResult = (toolResult) => {
 			break;
 		case 'readFile':
 			result = readFileToolInfo(toolResult.args, toolResult.result);
+			break;
+		case 'writeFile':
+			result = writeFileToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
 			result = {

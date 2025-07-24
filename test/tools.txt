@@ -2,3 +2,5 @@ weather in shanghai
 fetch top 10 titles from https://news.ycombinator.com/news
 show files in current directory
 what is the tech stack of this project
+read line 2 to 5 of README.md
+copy last 10 line of README.md to temp.txt
