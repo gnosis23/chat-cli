@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { streamText } from 'ai';
+import { streamText, APICallError, Error } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
 
@@ -44,7 +44,7 @@ export const useAIChat = (config = {}) => {
 				const result = streamText({
 					model: openrouter.chat(model),
 					messages: messages
-						.filter((x) => x.type !== 'tool')
+						.filter((x) => x.type != 'tool' && x.type != 'error')
 						.map((msg) => ({
 							role: msg.type === 'user' ? 'user' : 'assistant',
 							content: msg.text,
@@ -80,9 +80,19 @@ export const useAIChat = (config = {}) => {
 						}
 					},
 					onError(e) {
-						if (process.env.DEBUG === '1') {
-							console.error(e.error);
+						const error = e?.error || e;
+						let errorMessage;
+						if (APICallError.isInstance(error)) {
+							errorMessage =
+								'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
+						} else {
+							errorMessage = 'Unknown error';
 						}
+
+						setMessages((prev) => [
+							...prev,
+							{ type: 'error', text: errorMessage },
+						]);
 					},
 				});
 

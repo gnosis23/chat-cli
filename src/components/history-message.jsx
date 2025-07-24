@@ -13,6 +13,7 @@ const colors = {
 	bot: 'gray',
 	system: 'yellow',
 	tool: '#0098df',
+	error: 'red',
 };
 
 const prefixes = {
@@ -20,6 +21,7 @@ const prefixes = {
 	bot: '⏺',
 	system: '*',
 	tool: '#',
+	error: 'x',
 };
 
 export const HistoryMessage = ({ message, index }) => {
