@@ -93,8 +93,12 @@ export default function TextInput({
 		if (multiline) {
 			setLines(value.split('\n').length > 0 ? value.split('\n') : ['']);
 		}
-		// Don't reset cursor position here - let operations handle it
-	}, [value, multiline]);
+		// Ensure cursor position stays within bounds when value changes externally
+		const currentValue = multiline ? lines.join('\n') : value;
+		if (cursorPosition > currentValue.length) {
+			setCursorPosition(currentValue.length);
+		}
+	}, [value, multiline, cursorPosition, lines]);
 
 	useInput((input, key) => {
 		let newValue = multiline ? lines.join('\n') : value;
@@ -117,7 +121,7 @@ export default function TextInput({
 				const beforeCursor = newValue.slice(0, cursorPosition - 1);
 				const afterCursor = newValue.slice(cursorPosition);
 				newValue = beforeCursor + afterCursor;
-				newCursorPosition = cursorPosition - 1;
+				newCursorPosition = Math.max(0, cursorPosition - 1);
 			}
 		} else if (key.leftArrow) {
 			if (key.ctrl || key.meta) {
