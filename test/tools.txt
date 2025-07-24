@@ -6,3 +6,4 @@ read line 2 to 5 of README.md
 copy last 10 line of README.md to temp.txt
 update version to 1.0.0 in package.json
 what is the default *system* messages in useaichat
+Replace `Typing` to other verbs, random
