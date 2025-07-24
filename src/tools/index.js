@@ -4,6 +4,7 @@ import { bashTool, bashToolInfo } from './bash-tool.js';
 import { readFileTool, readFileToolInfo } from './read-file-tool.js';
 import { writeFileTool, writeFileToolInfo } from './write-file-tool.js';
 import { updateFileTool, updateFileToolInfo } from './update-file-tool.js';
+import { grepTool, grepToolInfo } from './grep-tool.js';
 
 export const toolsObject = {
 	fetch: fetchTool,
@@ -12,6 +13,7 @@ export const toolsObject = {
 	readFile: readFileTool,
 	writeFile: writeFileTool,
 	updateFile: updateFileTool,
+	grep: grepTool,
 };
 
 export const getToolResult = (toolResult) => {
@@ -34,6 +36,9 @@ export const getToolResult = (toolResult) => {
 			break;
 		case 'updateFile':
 			result = updateFileToolInfo(toolResult.args, toolResult.result);
+			break;
+		case 'grep':
+			result = grepToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
 			result = {

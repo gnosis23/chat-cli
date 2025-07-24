@@ -44,6 +44,7 @@ export const bashTool = tool({
 		- read a file: use readFileTool instead
 		- write a file: use writeFileTool instead
 		- update a file: use updateFileTool instead
+		- search text / grep: use grepTool instead
 	`,
 	parameters: z.object({
 		command: z.string().describe('The bash command to execute'),
