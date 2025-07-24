@@ -39,11 +39,19 @@ export const grepTool = tool({
 		pattern: z.string().describe(''),
 	}),
 	execute: async ({ pattern }) => {
-		const results = await bashGrep(pattern);
-		return {
-			pattern: pattern,
-			list: results,
-		};
+		try {
+			const results = await bashGrep(pattern);
+			return {
+				pattern: pattern,
+				list: results,
+			};
+		} catch (err) {
+			return {
+				pattern: pattern,
+				list: [],
+				error: `Error executing grep: ${err.message}`,
+			};
+		}
 	},
 });
 

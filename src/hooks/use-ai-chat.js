@@ -64,6 +64,10 @@ export const useAIChat = (config = {}) => {
 							console.log('toolResults:', toolResults);
 						}
 
+						if (text) {
+							setMessages((prev) => [...prev, { type: 'bot', text }]);
+						}
+
 						if (toolResults.length) {
 							for (const toolResult of toolResults) {
 								const result = getToolResult(toolResult);
@@ -86,6 +90,7 @@ export const useAIChat = (config = {}) => {
 							errorMessage =
 								'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
 						} else {
+							console.error('Error in AI chat:', error);
 							errorMessage = 'Unknown error';
 						}
 
@@ -134,14 +139,7 @@ export const useAIChat = (config = {}) => {
 			setCurrentInput('');
 
 			sendMessage(updatedMessages, (chunk, fullMessage) => {})
-				.then((fullResponse) => {
-					if (fullResponse) {
-						setMessages((prev) => [
-							...prev,
-							{ type: 'bot', text: fullResponse },
-						]);
-					}
-				})
+				.then((fullResponse) => {})
 				.catch((err) => {
 					// Error handled by useAIChat hook
 				});
