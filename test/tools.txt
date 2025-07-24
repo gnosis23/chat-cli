@@ -4,3 +4,4 @@ show files in current directory
 what is the tech stack of this project
 read line 2 to 5 of README.md
 copy last 10 line of README.md to temp.txt
+update version to 1.0.0 in package.json

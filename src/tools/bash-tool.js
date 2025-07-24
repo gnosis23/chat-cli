@@ -43,6 +43,7 @@ export const bashTool = tool({
 		Do not use this tool when:
 		- read a file: use readFileTool instead
 		- write a file: use writeFileTool instead
+		- update a file: use updateFileTool instead
 	`,
 	parameters: z.object({
 		command: z.string().describe('The bash command to execute'),
