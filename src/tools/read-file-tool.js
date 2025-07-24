@@ -58,8 +58,6 @@ export const readFileToolInfo = (
 	if (limit) title += `, ${limit}`;
 	return {
 		title,
-		text: success
-			? `Read ${limit || 'all'} lines from ${filePath}`
-			: `Failed to read file: ${error.message}`,
+		text: success ? `Read ${limit || 'all'} lines from ${filePath}` : text,
 	};
 };

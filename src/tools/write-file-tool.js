@@ -29,8 +29,6 @@ export const writeFileToolInfo = (
 ) => {
 	return {
 		title: filePath,
-		text: success
-			? `Wrote lines to ${filePath}`
-			: `Failed to write file: ${error.message}`,
+		text: success ? `Wrote lines to ${filePath}` : message,
 	};
 };
