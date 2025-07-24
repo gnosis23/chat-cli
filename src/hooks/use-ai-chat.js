@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { streamText, APICallError, Error } from 'ai';
+import { streamText, APICallError } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
 
