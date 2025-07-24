@@ -114,6 +114,19 @@ Once running, simply type your message and press Enter to send. The AI bot will 
 - Arrow keys for cursor navigation
 - Emacs-style keybindings (Ctrl+A, Ctrl+E, etc.)
 
+## Configuration
+
+### OpenRouter API Key
+
+This chat CLI uses OpenRouter for AI responses. You need to set your OpenRouter API key as an environment variable:
+
+```bash
+# Set your OpenRouter API key (macOS/Linux)
+export OPENROUTER_API_KEY="your-api-key-here"
+```
+
+You can obtain an API key from [OpenRouter](https://openrouter.ai/settings/keys).
+
 ## Development
 
 ### Prerequisites
@@ -142,3 +155,8 @@ pnpm xo
 # Run formatter
 pnpm run format
 ```
+
+## Supported Platforms
+
+- MacOS
+- Linux
