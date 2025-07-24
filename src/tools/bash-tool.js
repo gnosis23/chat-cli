@@ -37,7 +37,12 @@ async function executeCommand(command, timeout = 30000) {
 }
 
 export const bashTool = tool({
-	description: 'Execute bash commands and return output with exit status',
+	description: `
+		Execute bash commands and return output with exit status
+		
+		Do not use this tool when:
+		- read a file: use readFileTool instead
+	`,
 	parameters: z.object({
 		command: z.string().describe('The bash command to execute'),
 		timeout: z
