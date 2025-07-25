@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { streamText, APICallError } from 'ai';
+import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
 
@@ -128,6 +128,8 @@ export const useAIChat = (config = {}) => {
 						if (APICallError.isInstance(error)) {
 							errorMessage =
 								'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
+						} else if (InvalidToolArgumentsError.isInstance(error)) {
+							errorMessage = `${error.message}`;
 						} else {
 							console.error('Error in AI chat:', error);
 							errorMessage = 'Unknown error';
