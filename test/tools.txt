@@ -9,3 +9,4 @@ what is the default *system* messages in useaichat
 Replace `Typing` to other verbs, random
 find all jsx files
 summary this project and save to chat-cli.md, don't read file if you can guess by filename
+创建一个html页面用来展示当前目录下的git提交频率，类似github profile里的图

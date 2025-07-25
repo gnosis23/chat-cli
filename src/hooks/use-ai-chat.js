@@ -67,7 +67,7 @@ export const useAIChat = (config = {}) => {
 					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
 					maxTokens: config.maxTokens || 1000,
-					maxSteps: 10,
+					maxSteps: 20,
 					tools: toolsObject,
 					onStepFinish({ text, toolCalls, toolResults }) {
 						if (process.env.DEBUG === '1') {
@@ -129,7 +129,7 @@ export const useAIChat = (config = {}) => {
 							errorMessage =
 								'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
 						} else if (InvalidToolArgumentsError.isInstance(error)) {
-							errorMessage = `${error.message}`;
+							errorMessage = `call ${error.toolName} failed: ${error.message}`;
 						} else {
 							console.error('Error in AI chat:', error);
 							errorMessage = 'Unknown error';
@@ -137,7 +137,7 @@ export const useAIChat = (config = {}) => {
 
 						setMessages((prev) => [
 							...prev,
-							{ role: 'gui', type: 'error', content: errorMessage },
+							{ role: 'assistant', content: errorMessage },
 						]);
 					},
 				});
