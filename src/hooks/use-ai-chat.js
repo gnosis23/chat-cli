@@ -30,11 +30,7 @@ export const useAIChat = (config = {}) => {
 		{
 			role: 'system',
 			content:
-				'Welcome to the AI chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
-		},
-		{
-			role: 'system',
-			content: 'AI assistance enabled with DeepSeek integration.',
+				'Welcome to the Chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
 		},
 	]);
 	const [currentInput, setCurrentInput] = useState('');

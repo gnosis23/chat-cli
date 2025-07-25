@@ -1,9 +1,14 @@
 import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
+import { loadConfig, printConfig } from './lib/config.js';
 import App from './app.jsx';
 
-console.log('\n');
+const defaultConfig = {
+	model: 'deepseek/deepseek-chat-v3-0324',
+	temperature: 0.7,
+	maxTokens: 1000,
+};
 
 const cli = meow(
 	`
@@ -21,15 +26,15 @@ const cli = meow(
 		flags: {
 			model: {
 				type: 'string',
-				default: 'deepseek/deepseek-chat-v3-0324',
+				default: defaultConfig.model,
 			},
 			temperature: {
 				type: 'number',
-				default: 0.7,
+				default: defaultConfig.temperature,
 			},
 			maxTokens: {
 				type: 'number',
-				default: 1000,
+				default: defaultConfig.maxTokens,
 			},
 			apiKey: {
 				type: 'string',
@@ -38,4 +43,17 @@ const cli = meow(
 	}
 );
 
-render(React.createElement(App, { config: cli.flags }));
+function printWelcome() {
+	console.log('  Chat CLI - 0.1.0  	\n');
+}
+
+async function main() {
+	printWelcome();
+	const config = await loadConfig();
+	if (process.env.DEBUG === '1') {
+		printConfig(config);
+	}
+	render(React.createElement(App, { config: { ...config, ...cli.flags } }));
+}
+
+main();
