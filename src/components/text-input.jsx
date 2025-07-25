@@ -1,121 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useInput, Text, Box } from 'ink';
 
+const Input = ({ value, cursorPosition }) => {
+	const beforeCursor = value.slice(0, cursorPosition) || null;
+	const cursorChar = value.slice(cursorPosition, cursorPosition + 1) || ' ';
+	const afterCursor = value.slice(cursorPosition + 1) || null;
+
+	return (
+		<Box>
+			<Text>{beforeCursor}</Text>
+			<Text backgroundColor="white" color="black">
+				{cursorChar}
+			</Text>
+			<Text>{afterCursor}</Text>
+		</Box>
+	);
+};
+
 export default function TextInput({
 	value = '',
 	onChange,
 	onSubmit,
 	placeholder = '',
-	multiline = false,
-	maxLines = 10,
 	prefix = '> ',
 }) {
 	const [cursorPosition, setCursorPosition] = useState(0);
-	const [lines, setLines] = useState(['']);
-
-	const renderInput = () => {
-		if (multiline) {
-			const displayLines = lines.length > 0 ? lines : [''];
-			const cursorLineIndex = getCursorLineIndex();
-			const cursorLinePosition = getCursorLinePosition();
-
-			return displayLines.map((line, index) => {
-				const isCursorLine = index === cursorLineIndex;
-
-				if (isCursorLine) {
-					const beforeCursor = line.slice(0, cursorLinePosition);
-					const cursorChar =
-						line.slice(cursorLinePosition, cursorLinePosition + 1) || ' ';
-					const afterCursor = line.slice(cursorLinePosition + 1);
-
-					return (
-						<Text key={index}>
-							{beforeCursor}
-							<Text backgroundColor="white" color="black">
-								{cursorChar}
-							</Text>
-							{afterCursor}
-						</Text>
-					);
-				}
-
-				return <Text key={index}>{line || ' '}</Text>;
-			});
-		} else {
-			const beforeCursor = value.slice(0, cursorPosition);
-			const cursorChar = value.slice(cursorPosition, cursorPosition + 1) || ' ';
-			const afterCursor = value.slice(cursorPosition + 1);
-
-			return (
-				<Text>
-					{prefix}
-					{beforeCursor}
-					<Text backgroundColor="white" color="black">
-						{cursorChar}
-					</Text>
-					{afterCursor}
-				</Text>
-			);
-		}
-	};
-
-	const getCursorLineIndex = () => {
-		const currentValue = multiline ? lines.join('\n') : value;
-		const linesArray = currentValue.split('\n');
-		let charCount = 0;
-
-		for (let i = 0; i < linesArray.length; i++) {
-			if (cursorPosition <= charCount + linesArray[i].length) {
-				return i;
-			}
-			charCount += linesArray[i].length + 1; // +1 for newline
-		}
-
-		return linesArray.length - 1;
-	};
-
-	const getCursorLinePosition = () => {
-		const currentValue = multiline ? lines.join('\n') : value;
-		const linesArray = currentValue.split('\n');
-		let charCount = 0;
-
-		for (let i = 0; i < linesArray.length; i++) {
-			if (cursorPosition <= charCount + linesArray[i].length) {
-				return cursorPosition - charCount;
-			}
-			charCount += linesArray[i].length + 1; // +1 for newline
-		}
-
-		return linesArray[linesArray.length - 1]?.length || 0;
-	};
 
 	useEffect(() => {
-		if (multiline) {
-			setLines(value.split('\n').length > 0 ? value.split('\n') : ['']);
-		}
 		// Ensure cursor position stays within bounds when value changes externally
-		const currentValue = multiline ? lines.join('\n') : value;
-		if (cursorPosition > currentValue.length) {
-			setCursorPosition(currentValue.length);
+		if (cursorPosition > value.length) {
+			setCursorPosition(value.length);
 		}
-	}, [value, multiline, cursorPosition, lines]);
+	}, [value, cursorPosition]);
 
 	useInput((input, key) => {
-		let newValue = multiline ? lines.join('\n') : value;
+		let newValue = value;
 		let newCursorPosition = cursorPosition;
 		let shouldSubmit = false;
 
-		if (key.return) {
-			if (multiline && key.shift) {
-				// Shift+Enter for new line in multiline mode
-				const beforeCursor = newValue.slice(0, cursorPosition);
-				const afterCursor = newValue.slice(cursorPosition);
-				newValue = beforeCursor + '\n' + afterCursor;
-				newCursorPosition = cursorPosition + 1;
-			} else {
-				// Enter to submit
-				shouldSubmit = true;
-			}
+		// Handle paste events by checking for longer input strings
+		if (input && input.length > 1 && !key.ctrl && !key.meta) {
+			// This is likely a paste operation - replace newlines with spaces
+			const processedInput = input.replace(/\n/g, ' ');
+			const beforeCursor = newValue.slice(0, cursorPosition);
+			const afterCursor = newValue.slice(cursorPosition);
+			newValue = beforeCursor + processedInput + afterCursor;
+			newCursorPosition = cursorPosition + processedInput.length;
+		} else if (key.return) {
+			// Enter to submit
+			shouldSubmit = true;
 		} else if (key.backspace || key.delete) {
 			if (cursorPosition > 0) {
 				const beforeCursor = newValue.slice(0, cursorPosition - 1);
@@ -150,63 +83,6 @@ export default function TextInput({
 			} else {
 				// Right arrow: move cursor right
 				newCursorPosition = Math.min(newValue.length, cursorPosition + 1);
-			}
-		} else if (key.upArrow && multiline) {
-			// Up arrow: move cursor up in multiline mode
-			const currentLines = newValue.split('\n');
-			let charCount = 0;
-			let targetLine = -1;
-			let targetLineStart = 0;
-
-			for (let i = 0; i < currentLines.length; i++) {
-				const lineLength = currentLines[i].length + 1; // +1 for newline
-				if (
-					cursorPosition >= charCount &&
-					cursorPosition <= charCount + currentLines[i].length
-				) {
-					targetLine = Math.max(0, i - 1);
-					targetLineStart = currentLines
-						.slice(0, targetLine)
-						.reduce((sum, line) => sum + line.length + 1, 0);
-					break;
-				}
-				charCount += lineLength;
-			}
-
-			if (targetLine >= 0) {
-				const linePos =
-					cursorPosition - (charCount - currentLines[targetLine].length - 1);
-				newCursorPosition =
-					targetLineStart + Math.min(linePos, currentLines[targetLine].length);
-			}
-		} else if (key.downArrow && multiline) {
-			// Down arrow: move cursor down in multiline mode
-			const currentLines = newValue.split('\n');
-			let charCount = 0;
-			let targetLine = -1;
-			let targetLineStart = 0;
-
-			for (let i = 0; i < currentLines.length; i++) {
-				const lineLength = currentLines[i].length + 1; // +1 for newline
-				if (
-					cursorPosition >= charCount &&
-					cursorPosition <= charCount + currentLines[i].length
-				) {
-					targetLine = Math.min(currentLines.length - 1, i + 1);
-					targetLineStart = currentLines
-						.slice(0, targetLine)
-						.reduce((sum, line) => sum + line.length + 1, 0);
-					break;
-				}
-				charCount += lineLength;
-			}
-
-			if (targetLine >= 0 && targetLine < currentLines.length) {
-				const linePos =
-					cursorPosition -
-					(charCount - currentLines[targetLine - 1].length - 1);
-				newCursorPosition =
-					targetLineStart + Math.min(linePos, currentLines[targetLine].length);
 			}
 		} else if (key.ctrl || key.meta) {
 			// Ctrl shortcuts
@@ -273,34 +149,31 @@ export default function TextInput({
 					return;
 			}
 		} else if (input && !key.ctrl && !key.meta) {
-			// Regular character input
+			// Regular character input - filter out newlines and replace with spaces
+			if (input === '\n') {
+				return; // Ignore newline
+			}
+			const processedInput = input.replace(/\n/g, ' ');
 			const beforeCursor = newValue.slice(0, cursorPosition);
 			const afterCursor = newValue.slice(cursorPosition);
-			newValue = beforeCursor + input + afterCursor;
-			newCursorPosition = cursorPosition + 1;
+			newValue = beforeCursor + processedInput + afterCursor;
+			newCursorPosition = cursorPosition + processedInput.length;
 		} else {
 			return;
 		}
 
 		if (shouldSubmit) {
-			onSubmit && onSubmit(multiline ? lines.join('\n') : value);
+			onSubmit && onSubmit(value);
 		} else {
 			setCursorPosition(newCursorPosition);
-			if (multiline) {
-				setLines(newValue.split('\n'));
-			}
 			onChange && onChange(newValue);
 		}
 	});
 
 	return (
-		<Box
-			flexDirection={multiline ? 'column' : 'row'}
-			borderStyle="single"
-			borderColor="white"
-			maxHeight={multiline ? maxLines + 2 : 3}
-		>
-			{renderInput()}
+		<Box display="flex" borderStyle="single" borderColor="white">
+			<Text>{prefix}</Text>
+			<Input value={value} cursorPosition={cursorPosition} />
 		</Box>
 	);
 }

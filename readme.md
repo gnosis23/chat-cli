@@ -9,7 +9,6 @@ A terminal-based AI chat application built with [Ink](https://github.com/vadimde
 - **Message History**: Persistent chat history during session
 - **Loading States**: Visual feedback while processing responses
 - **Advanced Text Input**: Full keyboard shortcuts and cursor navigation
-- **Multi-line Support**: Shift+Enter for new lines (when enabled)
 
 ## Quick Start
 
@@ -83,11 +82,6 @@ The chat interface includes a sophisticated text input component with full keybo
 - **Ctrl+H**: Backspace
 - **Ctrl+L**: Clear entire line
 - **Backspace/Delete**: Standard character deletion
-
-### Multi-line Input (when enabled)
-
-- **Shift+Enter**: Insert new line
-- **Up/Down Arrow**: Navigate between lines
 
 ## Technical Details
 
