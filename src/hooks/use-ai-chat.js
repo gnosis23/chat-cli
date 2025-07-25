@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
+import { commands } from '../commands';
 
 const convertToAISdkMessages = (messages) => {
 	return messages
@@ -170,6 +171,14 @@ export const useAIChat = (config = {}) => {
 
 	const handleSubmit = (inputText) => {
 		if (inputText.trim()) {
+			const words = inputText.trim().split(/\s+/);
+			if (words[0] && commands[words[0]]) {
+				const func = commands[words[0]];
+				func();
+				setCurrentInput('');
+				return;
+			}
+
 			const userMessage = { role: 'user', content: inputText.trim() };
 			const updatedMessages = [...messages, userMessage];
 			setMessages(updatedMessages);
