@@ -2,13 +2,8 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import { loadConfig, printConfig } from './lib/config.js';
+import { defaultConfig } from './constant.js';
 import App from './app.jsx';
-
-const defaultConfig = {
-	model: 'deepseek/deepseek-chat-v3-0324',
-	temperature: 0.7,
-	maxTokens: 1000,
-};
 
 const cli = meow(
 	`

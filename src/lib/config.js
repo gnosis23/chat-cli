@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { defaultConfig } from '../constant.js';
 
 export async function loadConfig() {
 	// read ~/.chat-cli.json
