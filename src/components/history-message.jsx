@@ -10,7 +10,7 @@ marked.use(markedTerminal({}));
 
 const colors = {
 	user: 'blue',
-	bot: 'gray',
+	assistant: 'gray',
 	system: 'yellow',
 	tool: '#0098df',
 	error: 'red',
@@ -18,17 +18,17 @@ const colors = {
 
 const prefixes = {
 	user: '>',
-	bot: '⏺',
+	assistant: '⏺',
 	system: '*',
 	tool: '#',
 	error: 'x',
 };
 
 export const HistoryMessage = ({ message, index }) => {
-	if (message.type === 'tool') {
-		return (
-			<Box key={index} display="flex" marginBottom={1}>
-				<Text color="cyan">{prefixes[message.type]}</Text>
+	if (message.role === 'tool') {
+		return message.content.map((tool, idx) => (
+			<Box key={`tool-${idx}`} display="flex" marginBottom={1}>
+				<Text color="cyan">{prefixes.tool}</Text>
 				<Box
 					flexDirection="column"
 					paddingLeft={GAP_SIZE}
@@ -36,30 +36,37 @@ export const HistoryMessage = ({ message, index }) => {
 				>
 					<Box>
 						<Text color={colors.tool} bold>
-							{message.toolName}
+							{tool.toolName}
 						</Text>
-						<Text>({message.title})</Text>
+						<Text>({tool.title})</Text>
 					</Box>
-					<Text color="gray">{message.text}</Text>
+					<Text color="gray">{tool.result}</Text>
 				</Box>
 			</Box>
-		);
+		));
+	}
+
+	if (message.role === 'assistant' && typeof message.content !== 'string') {
+		// ignore tool
+		return null;
 	}
 
 	const text =
-		message.type === 'bot'
-			? marked(dedent(message.text)).trim()
-			: dedent(message.text).trim();
+		message.role === 'assistant' && typeof message.content === 'string'
+			? marked(dedent(message.content)).trim()
+			: typeof message.content === 'string'
+				? dedent(message.content).trim()
+				: null;
 
 	return (
 		<Box key={index} display="flex" marginBottom={1}>
-			<Text>{prefixes[message.type]}</Text>
+			<Text>{prefixes[message.role]}</Text>
 			<Box
 				flexDirection="column"
 				paddingLeft={GAP_SIZE}
 				paddingRight={GAP_SIZE}
 			>
-				<Text color={colors[message.type]}>{text}</Text>
+				<Text color={colors[message.role]}>{text}</Text>
 			</Box>
 		</Box>
 	);

@@ -4,16 +4,37 @@ import { streamText, APICallError } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
 
+const convertToAISdkMessages = (messages) => {
+	return messages
+		.filter((x) => x.role != 'gui')
+		.map((message) => {
+			if (message.role === 'tool') {
+				// remove title in content
+				return {
+					role: 'tool',
+					content: message.content.map((x) => ({
+						type: 'tool-result',
+						toolCallId: x.toolCallId,
+						toolName: x.toolName,
+						result: x.text,
+					})),
+				};
+			}
+			return message;
+		});
+};
+
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
 	const [messages, setMessages] = useState([
 		{
-			type: 'system',
-			text: 'Welcome to the AI chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
+			role: 'system',
+			content:
+				'Welcome to the AI chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
 		},
 		{
-			type: 'system',
-			text: 'AI assistance enabled with DeepSeek integration.',
+			role: 'system',
+			content: 'AI assistance enabled with DeepSeek integration.',
 		},
 	]);
 	const [currentInput, setCurrentInput] = useState('');
@@ -43,12 +64,7 @@ export const useAIChat = (config = {}) => {
 			try {
 				const result = streamText({
 					model: openrouter.chat(model),
-					messages: messages
-						.filter((x) => x.type != 'tool' && x.type != 'error')
-						.map((msg) => ({
-							role: msg.type === 'user' ? 'user' : 'assistant',
-							content: msg.text,
-						})),
+					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
 					maxTokens: config.maxTokens || 1000,
 					maxSteps: 10,
@@ -65,22 +81,45 @@ export const useAIChat = (config = {}) => {
 						}
 
 						if (text) {
-							setMessages((prev) => [...prev, { type: 'bot', text }]);
+							setMessages((prev) => [
+								...prev,
+								{ role: 'assistant', content: text },
+							]);
+						}
+
+						if (toolCalls.length) {
+							setMessages((prev) => [
+								...prev,
+								{
+									role: 'assistant',
+									content: toolCalls.map((toolCall) => ({
+										type: 'tool-call',
+										toolCallId: toolCall.toolCallId,
+										toolName: toolCall.toolName,
+										args: toolCall.args || {},
+									})),
+								},
+							]);
 						}
 
 						if (toolResults.length) {
-							for (const toolResult of toolResults) {
-								const result = getToolResult(toolResult);
-								setMessages((prev) => [
-									...prev,
-									{
-										type: 'tool',
-										toolName: toolResult.toolName,
-										title: result.title,
-										text: result.text,
-									},
-								]);
-							}
+							setMessages((prev) => [
+								...prev,
+								{
+									role: 'tool',
+									content: toolResults.map((toolResult) => {
+										const result = getToolResult(toolResult);
+										return {
+											type: 'tool-result',
+											toolCallId: toolResult.toolCallId,
+											toolName: toolResult.toolName,
+											result: result.text,
+											// custom field
+											title: result.title,
+										};
+									}),
+								},
+							]);
 						}
 					},
 					onError(e) {
@@ -96,7 +135,7 @@ export const useAIChat = (config = {}) => {
 
 						setMessages((prev) => [
 							...prev,
-							{ type: 'error', text: errorMessage },
+							{ role: 'gui', type: 'error', content: errorMessage },
 						]);
 					},
 				});
@@ -133,7 +172,7 @@ export const useAIChat = (config = {}) => {
 
 	const handleSubmit = (inputText) => {
 		if (inputText.trim()) {
-			const userMessage = { type: 'user', text: inputText.trim() };
+			const userMessage = { role: 'user', content: inputText.trim() };
 			const updatedMessages = [...messages, userMessage];
 			setMessages(updatedMessages);
 			setCurrentInput('');

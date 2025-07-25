@@ -8,3 +8,4 @@ update version to 1.0.0 in package.json
 what is the default *system* messages in useaichat
 Replace `Typing` to other verbs, random
 find all jsx files
+summary this project and save to chat-cli.md, don't read file if you can guess by filename
