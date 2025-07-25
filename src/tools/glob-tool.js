@@ -3,13 +3,16 @@ import { z } from 'zod';
 import { glob } from 'glob';
 
 export const globTool = tool({
-	description: '',
+	description:
+		'glob files matching a pattern, ignoring node_modules and .git directories',
 	parameters: z.object({
 		pattern: z.string().describe('The glob pattern to match files'),
 	}),
 	execute: async ({ pattern }) => {
 		try {
-			const files = await glob(pattern);
+			const files = await glob(pattern, {
+				ignore: ['node_modules/**', '.git/**'],
+			});
 			return { files };
 		} catch (error) {
 			return { files: [], error: `Failed to glob files: ${error.message}` };
