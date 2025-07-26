@@ -12,7 +12,7 @@
 		"build": "vite build",
 		"dev": "vite build --watch",
 		"test": "prettier --check .",
-		"format": "prettier --write src/"
+		"format": "prettier --write --log-level error src/"
 	},
 	"files": [
 		"dist"
