@@ -22,7 +22,7 @@ export function printConfig(config) {
 	console.log('Using configuration:');
 	console.log(`- Model: ${config.model}`);
 	console.log(`- Temperature: ${config.temperature}`);
-	if (config.apiKey) {
+	if (config.apiKey || process.env.OPENROUTER_API_KEY) {
 		console.log('- API Key: Provided');
 	} else {
 		console.log('- API Key: Not provided');
