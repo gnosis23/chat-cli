@@ -22,7 +22,6 @@ export function printConfig(config) {
 	console.log('Using configuration:');
 	console.log(`- Model: ${config.model}`);
 	console.log(`- Temperature: ${config.temperature}`);
-	console.log(`- Max Tokens: ${config.maxTokens}`);
 	if (config.apiKey) {
 		console.log('- API Key: Provided');
 	} else {

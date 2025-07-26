@@ -24,9 +24,6 @@ const cli = meow(
 			temperature: {
 				type: 'number',
 			},
-			maxTokens: {
-				type: 'number',
-			},
 			apiKey: {
 				type: 'string',
 			},

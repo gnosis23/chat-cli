@@ -63,7 +63,6 @@ export const useAIChat = (config = {}) => {
 					model: openrouter.chat(model),
 					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
-					maxTokens: config.maxTokens || 1000,
 					maxSteps: 20,
 					tools: toolsObject,
 					onStepFinish({ text, toolCalls, toolResults }) {
