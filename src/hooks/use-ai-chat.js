@@ -4,6 +4,7 @@ import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { toolsObject, getToolResult } from '../tools';
 import { commands } from '../commands';
+import { systemPrompt } from '../prompt.js';
 
 const convertToAISdkMessages = (messages) => {
 	return messages
@@ -30,8 +31,7 @@ export const useAIChat = (config = {}) => {
 	const [messages, setMessages] = useState([
 		{
 			role: 'system',
-			content:
-				'Welcome to the Chat CLI! Type a message and press Enter to send, press Ctrl+C to exit.',
+			content: systemPrompt,
 		},
 	]);
 	const [currentInput, setCurrentInput] = useState('');

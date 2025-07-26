@@ -25,6 +25,10 @@ const prefixes = {
 };
 
 export const HistoryMessage = ({ message, index }) => {
+	if (message.role === 'system') {
+		return null;
+	}
+
 	if (message.role === 'tool') {
 		return message.content.map((tool, idx) => (
 			<Box key={`tool-${idx}`} display="flex" marginBottom={1}>

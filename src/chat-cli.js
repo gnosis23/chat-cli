@@ -2,7 +2,6 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import { loadConfig, printConfig } from './lib/config.js';
-import { defaultConfig } from './constant.js';
 import App from './app.jsx';
 
 const cli = meow(
@@ -21,15 +20,12 @@ const cli = meow(
 		flags: {
 			model: {
 				type: 'string',
-				default: defaultConfig.model,
 			},
 			temperature: {
 				type: 'number',
-				default: defaultConfig.temperature,
 			},
 			maxTokens: {
 				type: 'number',
-				default: defaultConfig.maxTokens,
 			},
 			apiKey: {
 				type: 'string',

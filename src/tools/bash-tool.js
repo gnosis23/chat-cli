@@ -66,13 +66,23 @@ export const bashTool = tool({
 	},
 });
 
+function topOutput(output) {
+	if (!output) return '';
+	const lines = output.split('\n').filter((line) => line.trim() !== '');
+	let ret = lines.slice(0, 5).join('\n');
+	if (lines.length > 5) {
+		ret += `\n... (${lines.length - 5} more lines)`;
+	}
+	return ret;
+}
+
 export const bashToolInfo = (
 	{ command },
 	{ stdout, stderr, exitCode, success }
 ) => {
 	const summary = success ? 'Command executed successfully' : 'Command failed';
 	const output =
-		stdout || stderr ? `\n\`\`\`\n${stdout || stderr}\n\`\`\`` : '';
+		stdout || stderr ? `\n\`\`\`\n${topOutput(stdout || stderr)}\n\`\`\`` : '';
 
 	return {
 		title: `${command}`,
