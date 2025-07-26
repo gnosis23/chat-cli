@@ -6,6 +6,10 @@ import { toolsObject, getToolResult } from '../tools';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
 
+const openrouter = createOpenRouter({
+	apiKey: process.env.OPENROUTER_API_KEY,
+});
+
 const convertToAISdkMessages = (messages) => {
 	return messages
 		.filter((x) => x.role != 'gui')
@@ -40,10 +44,6 @@ export const useAIChat = (config = {}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 
-	const openrouter = createOpenRouter({
-		apiKey: config.apiKey || process.env.OPENROUTER_API_KEY,
-	});
-
 	const model =
 		config.model ||
 		process.env.CHATCLI_MODEL ||
@@ -63,7 +63,7 @@ export const useAIChat = (config = {}) => {
 					model: openrouter.chat(model),
 					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
-					maxSteps: 20,
+					maxSteps: 30,
 					tools: toolsObject,
 					onStepFinish({ text, toolCalls, toolResults }) {
 						if (process.env.DEBUG === '1') {
