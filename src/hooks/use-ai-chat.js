@@ -6,10 +6,6 @@ import { toolsObject, getToolResult } from '../tools';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
 
-const openrouter = createOpenRouter({
-	apiKey: process.env.OPENROUTER_API_KEY,
-});
-
 const convertToAISdkMessages = (messages) => {
 	return messages
 		.filter((x) => x.role != 'gui')
@@ -48,6 +44,10 @@ export const useAIChat = (config = {}) => {
 		config.model ||
 		process.env.CHATCLI_MODEL ||
 		'deepseek/deepseek-chat-v3-0324';
+
+	const openrouter = createOpenRouter({
+		apiKey: config.apiKey || process.env.OPENROUTER_API_KEY,
+	});
 
 	const sendMessage = useCallback(
 		async (messages, onChunk) => {
