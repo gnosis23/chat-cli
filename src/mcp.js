@@ -12,6 +12,7 @@ export async function initMcp(config) {
 				const transport = new Experimental_StdioMCPTransport({
 					command: server.command,
 					args: server.args || [],
+					stderr: 'ignore',
 				});
 				const client = await experimental_createMCPClient({
 					transport,
