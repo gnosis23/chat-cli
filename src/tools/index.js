@@ -6,6 +6,7 @@ import { writeFileTool, writeFileToolInfo } from './write-file-tool.js';
 import { updateFileTool, updateFileToolInfo } from './update-file-tool.js';
 import { grepTool, grepToolInfo } from './grep-tool.js';
 import { globTool, globToolInfo } from './glob-tool.js';
+import { writeTodoTool, writeTodoToolInfo } from './write-todo-tool.js';
 
 export const toolsObject = {
 	fetch: fetchTool,
@@ -16,6 +17,7 @@ export const toolsObject = {
 	updateFile: updateFileTool,
 	grep: grepTool,
 	glob: globTool,
+	writeTodo: writeTodoTool,
 };
 
 export const getToolResult = (toolResult) => {
@@ -44,6 +46,9 @@ export const getToolResult = (toolResult) => {
 			break;
 		case 'glob':
 			result = globToolInfo(toolResult.args, toolResult.result);
+			break;
+		case 'writeTodo':
+			result = writeTodoToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
 			result = {
