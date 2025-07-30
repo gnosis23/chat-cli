@@ -6,6 +6,7 @@ export async function initMcp(config) {
 		let tools = {};
 		const { mcpServers = {} } = config;
 		const mcpServerNames = Object.keys(mcpServers);
+
 		for (let mcp of mcpServerNames) {
 			const server = mcpServers[mcp];
 			if (server.command === 'node' || server.command === 'npx') {
@@ -24,6 +25,11 @@ export async function initMcp(config) {
 				tools = { ...tools, ...toolSet };
 			}
 		}
+
+		if (Object.keys(tools).length) {
+			console.log(`  Loaded ${Object.keys(tools).length} Mcp.\n`);
+		}
+
 		config.tools = tools;
 	} catch (err) {
 		console.log('Invalid mcpServers', err.message, config.mcpServers);

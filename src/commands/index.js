@@ -1,5 +1,6 @@
 import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
+import { showMcpCommand } from './mcp-command.js';
 
 function showCommand() {
 	const keys = Object.keys(commands);
@@ -15,4 +16,5 @@ export const commands = {
 	'/config': configCommand,
 	'/tools': toolsCommand,
 	'/commands': showCommand,
+	'/mcp': showMcpCommand,
 };

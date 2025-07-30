@@ -173,7 +173,7 @@ export const useAIChat = (config = {}) => {
 			const words = inputText.trim().split(/\s+/);
 			if (words[0] && commands[words[0]]) {
 				const func = commands[words[0]];
-				func();
+				func(config);
 				setCurrentInput('');
 				return;
 			}
