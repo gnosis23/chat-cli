@@ -64,7 +64,7 @@ export const useAIChat = (config = {}) => {
 					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
 					maxSteps: 30,
-					tools: toolsObject,
+					tools: { ...config.tools, ...toolsObject },
 					onStepFinish({ text, toolCalls, toolResults }) {
 						if (process.env.DEBUG === '1') {
 							console.log(

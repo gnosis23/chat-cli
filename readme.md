@@ -121,6 +121,24 @@ export OPENROUTER_API_KEY="your-api-key-here"
 
 You can obtain an API key from [OpenRouter](https://openrouter.ai/settings/keys).
 
+### Mcp Servers
+
+Add `mcpServers` in `$HOME/.chat-cli.json`
+
+```json
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}
+```
+
 ## Development
 
 ### Prerequisites

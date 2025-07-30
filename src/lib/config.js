@@ -10,7 +10,9 @@ export async function loadConfig() {
 		.catch(() => false);
 	if (exist) {
 		const configFile = await fs.readFile(configPath, 'utf-8');
-		return JSON.parse(configFile);
+		const obj = JSON.parse(configFile);
+		if (!obj.mcpServers) obj.mcpServers = {};
+		return obj;
 	} else {
 		await fs.writeFile(configPath, JSON.stringify(defaultConfig, null, 2));
 	}

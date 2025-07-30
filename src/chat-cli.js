@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import { loadConfig, printConfig } from './lib/config.js';
+import { initMcp } from './mcp.js';
 import App from './app.jsx';
 
 const cli = meow(
@@ -41,6 +42,9 @@ async function main() {
 	if (process.env.DEBUG === '1') {
 		printConfig(config);
 	}
+
+	await initMcp(config);
+
 	render(React.createElement(App, { config: { ...config, ...cli.flags } }));
 }
 
