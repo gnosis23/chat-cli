@@ -83,6 +83,17 @@ The chat interface includes a sophisticated text input component with full keybo
 - **Ctrl+L**: Clear entire line
 - **Backspace/Delete**: Standard character deletion
 
+### Built-in Commands
+
+Type these commands directly in the chat interface:
+
+| Command     | Description |
+| ----------- | ----------- |
+| `/commands` | List all available commands |
+| `/mcp`      | Show MCP (Model Context Protocol) status and available servers |
+| `/tools`    | Show built-in tools         |
+| `/config`   | Show configs                |
+
 ## Technical Details
 
 - **Runtime**: Node.js >=16 (ES modules)
