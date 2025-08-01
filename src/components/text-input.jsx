@@ -242,7 +242,7 @@ export default function TextInput({
 									index === selectedCommandIndex ? 'blue' : undefined
 								}
 							>
-								{cmd}
+								{cmd} - {commands[cmd].description}
 							</Text>
 						</Box>
 					))}

@@ -2,19 +2,33 @@ import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
 
-function showCommand() {
+function showHelp() {
 	const keys = Object.keys(commands);
-	console.log('--------------------------------------');
-	console.log('Commands:');
+	console.log('');
+	console.log('Chat-CLI');
+	console.log('');
+	console.log('Interactive Mode Commands:');
 	keys.forEach((key) => {
-		console.log(`- ${key}`);
+		console.log(`  ${key} - ${commands[key].description}`);
 	});
-	console.log('--------------------------------------\n');
+	console.log('\n');
 }
 
 export const commands = {
-	'/config': configCommand,
-	'/tools': toolsCommand,
-	'/commands': showCommand,
-	'/mcp': showMcpCommand,
+	'/config': {
+		description: 'show config',
+		func: configCommand,
+	},
+	'/tools': {
+		description: 'list built-in tools',
+		func: toolsCommand,
+	},
+	'/help': {
+		description: 'show help',
+		func: showHelp,
+	},
+	'/mcp': {
+		description: 'Manage MCP servers',
+		func: showMcpCommand,
+	},
 };
