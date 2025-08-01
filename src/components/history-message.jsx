@@ -1,12 +1,9 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 import dedent from 'dedent';
-import { marked } from 'marked';
-import { markedTerminal } from 'marked-terminal';
 
+import marked from '../lib/marked.js';
 import { GAP_SIZE } from '../constant.js';
-
-marked.use(markedTerminal({}));
 
 const colors = {
 	user: 'blue',

@@ -11,8 +11,8 @@
 		"start": "node dist/chat-cli.js",
 		"build": "vite build",
 		"dev": "vite build --watch",
-		"test": "prettier --check .",
-		"format": "prettier --write --log-level error src/"
+		"test": "vitest --run",
+		"format": "prettier --write --log-level error src/ test/"
 	},
 	"files": [
 		"dist"
@@ -36,7 +36,8 @@
 		"chalk": "^5.2.0",
 		"import-jsx": "^5.0.0",
 		"prettier": "^3.6.2",
-		"vite": "^7.0.5"
+		"vite": "^7.0.5",
+		"vitest": "^3.2.4"
 	},
 	"ava": {
 		"environmentVariables": {
