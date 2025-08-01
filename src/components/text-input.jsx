@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useInput, Text, Box } from 'ink';
+import { commands } from '../commands/index.js';
 
 const Input = ({ value, cursorPosition }) => {
 	const beforeCursor = value.slice(0, cursorPosition) || null;
@@ -23,8 +24,58 @@ export default function TextInput({
 	onSubmit,
 	placeholder = '',
 	prefix = '> ',
+	isLoading,
 }) {
 	const [cursorPosition, setCursorPosition] = useState(0);
+	const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
+	const [showCommands, setShowCommands] = useState(false);
+
+	const commandList = Object.keys(commands);
+	const filteredCommands = value.startsWith('/')
+		? commandList.filter((cmd) => cmd.startsWith(value))
+		: [];
+
+	useEffect(() => {
+		// Show commands when input starts with /
+		const shouldShow =
+			value.startsWith('/') &&
+			value.length > 0 &&
+			!filteredCommands.includes(value);
+		setShowCommands(shouldShow);
+
+		// Reset selection when commands change
+		// if (shouldShow && filteredCommands.length > 0) {
+		// 	setSelectedCommandIndex(0);
+		// }
+	}, [value, filteredCommands]);
+
+	const onArrowKeyAndEnter = (input, key) => {
+		if (showCommands && filteredCommands.length > 0) {
+			if (key.upArrow) {
+				setSelectedCommandIndex((prev) =>
+					prev > 0 ? prev - 1 : filteredCommands.length - 1
+				);
+				return true; // Prevent default handling
+			}
+			if (key.downArrow) {
+				setSelectedCommandIndex((prev) => (prev + 1) % filteredCommands.length);
+				return true; // Prevent default handling
+			}
+			if (key.return && filteredCommands.length > 0) {
+				// Auto-complete the selected command
+				const index =
+					selectedCommandIndex >= filteredCommands.length
+						? 0
+						: selectedCommandIndex;
+				const selectedCommand = filteredCommands[index];
+				onChange(selectedCommand);
+				setCursorPosition(selectedCommand.length);
+				setShowCommands(false);
+				return true; // Prevent default handling
+			}
+		}
+		return false; // Allow default handling
+	};
 
 	useEffect(() => {
 		// Ensure cursor position stays within bounds when value changes externally
@@ -37,6 +88,10 @@ export default function TextInput({
 		let newValue = value;
 		let newCursorPosition = cursorPosition;
 		let shouldSubmit = false;
+
+		if (onArrowKeyAndEnter && onArrowKeyAndEnter(input, key)) {
+			return;
+		}
 
 		// Handle paste events by checking for longer input strings
 		if (input && input.length > 1 && !key.ctrl && !key.meta) {
@@ -171,9 +226,39 @@ export default function TextInput({
 	});
 
 	return (
-		<Box display="flex" borderStyle="single" borderColor="white">
-			<Text>{prefix}</Text>
-			<Input value={value} cursorPosition={cursorPosition} />
-		</Box>
+		<>
+			<Box display="flex" borderStyle="single" borderColor="white">
+				<Text>{prefix}</Text>
+				<Input value={value} cursorPosition={cursorPosition} />
+			</Box>
+			{/* Command suggestions */}
+			{showCommands && filteredCommands.length > 0 && (
+				<Box flexDirection="column">
+					{filteredCommands.map((cmd, index) => (
+						<Box key={cmd} paddingLeft={2}>
+							<Text
+								color={index === selectedCommandIndex ? 'white' : 'gray'}
+								backgroundColor={
+									index === selectedCommandIndex ? 'blue' : undefined
+								}
+							>
+								{cmd}
+							</Text>
+						</Box>
+					))}
+				</Box>
+			)}
+
+			{/* Help text - hidden when commands are shown */}
+			{!showCommands && (
+				<Box marginBottom={1}>
+					<Text color="white" dimColor>
+						{isLoading
+							? 'Press Ctrl+C to cancel'
+							: 'Press Enter to send | Press Ctrl+C to exit | "/" to list commands'}
+					</Text>
+				</Box>
+			)}
+		</>
 	);
 }

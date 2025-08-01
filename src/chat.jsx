@@ -52,16 +52,8 @@ export default function ChatApp({ config = {} }) {
 				onChange={setCurrentInput}
 				onSubmit={handleSubmit}
 				prefix="> "
+				isLoading={isLoading}
 			/>
-
-			{/* Help text */}
-			<Box marginBottom={1}>
-				<Text color="white" dimColor>
-					{isLoading
-						? 'Press Ctrl+C to cancel'
-						: 'Press Enter to send | Press Ctrl+C to exit | Arrow keys to navigate'}
-				</Text>
-			</Box>
 		</Box>
 	);
 }
