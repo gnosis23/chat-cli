@@ -1,7 +1,7 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { createOpenAI } from '@ai-sdk/openai';
 import { toolsObject, getToolResult } from '../tools';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
@@ -45,8 +45,13 @@ export const useAIChat = (config = {}) => {
 		process.env.CHATCLI_MODEL ||
 		'deepseek/deepseek-chat-v3-0324';
 
-	const openrouter = createOpenRouter({
+	const openai = createOpenAI({
+		baseURL: 'https://openrouter.ai/api/v1',
 		apiKey: config.apiKey || process.env.OPENROUTER_API_KEY,
+		// custom settings, e.g.
+		headers: {
+			'X-Title': 'chat-cli',
+		},
 	});
 
 	const sendMessage = useCallback(
@@ -60,7 +65,7 @@ export const useAIChat = (config = {}) => {
 
 			try {
 				const result = streamText({
-					model: openrouter.chat(model),
+					model: openai.chat(model),
 					messages: convertToAISdkMessages(messages),
 					temperature: config.temperature || 0.7,
 					maxSteps: 30,
