@@ -8,7 +8,7 @@ import App from './app.jsx';
 const cli = meow(
 	`
 		Usage
-		  $ ink-app
+		  $ chat-cli
 
 		Options
 		  --model        AI model to use (default: deepseek-chat)
@@ -33,7 +33,9 @@ const cli = meow(
 );
 
 function printWelcome() {
-	console.log('  Chat CLI - 0.1.0  	\n');
+	console.log('');
+	console.log('  Chat CLI - 0.1.0');
+	console.log('');
 }
 
 async function main() {
