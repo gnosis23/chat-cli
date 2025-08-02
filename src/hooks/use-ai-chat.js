@@ -2,12 +2,12 @@ import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
-import { toolsObject, getToolResult } from '../tools';
+import { toolsObject, convertToolResultForUser } from '../tools';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
 
 const convertToAISdkMessages = (messages) => {
-	return messages
+	const list = messages
 		.filter((x) => x.role != 'gui')
 		.map((message) => {
 			if (message.role === 'tool') {
@@ -18,12 +18,20 @@ const convertToAISdkMessages = (messages) => {
 						type: 'tool-result',
 						toolCallId: x.toolCallId,
 						toolName: x.toolName,
-						result: x.text,
+						args: x.args,
+						result: x.result,
 					})),
 				};
 			}
 			return message;
 		});
+
+	if (process.env.DEBUG === '1') {
+		console.log('messages:');
+		console.log(JSON.stringify(list, null, 2));
+	}
+
+	return list;
 };
 
 export const useAIChat = (config = {}) => {
@@ -63,35 +71,23 @@ export const useAIChat = (config = {}) => {
 			setStreamingMessage('');
 			setStreamingTokenCount(0);
 
+			const currentMessages = [...messages];
+
 			try {
-				const result = streamText({
-					model: openai.chat(model),
-					messages: convertToAISdkMessages(messages),
-					temperature: config.temperature || 0.7,
-					maxSteps: 30,
-					tools: { ...config.tools, ...toolsObject },
-					onStepFinish({ text, toolCalls, toolResults }) {
-						if (process.env.DEBUG === '1') {
-							console.log(
-								'---------------------------------------------------'
-							);
-							console.log('onStepFinish:');
-							console.log('text:', text);
-							console.log('toolCalls:', toolCalls);
-							console.log('toolResults:', toolResults);
-						}
+				// main loop
+				while (true) {
+					const result = streamText({
+						model: openai.chat(model),
+						messages: convertToAISdkMessages(currentMessages),
+						temperature: config.temperature || 0.7,
+						tools: { ...config.tools, ...toolsObject },
+						onStepFinish({ text, toolCalls, toolResults }) {
+							if (text) {
+								currentMessages.push({ role: 'assistant', content: text });
+							}
 
-						if (text) {
-							setMessages((prev) => [
-								...prev,
-								{ role: 'assistant', content: text },
-							]);
-						}
-
-						if (toolCalls.length) {
-							setMessages((prev) => [
-								...prev,
-								{
+							if (toolCalls.length) {
+								currentMessages.push({
 									role: 'assistant',
 									content: toolCalls.map((toolCall) => ({
 										type: 'tool-call',
@@ -99,61 +95,78 @@ export const useAIChat = (config = {}) => {
 										toolName: toolCall.toolName,
 										args: toolCall.args || {},
 									})),
-								},
-							]);
-						}
+								});
+							}
 
-						if (toolResults.length) {
-							setMessages((prev) => [
-								...prev,
-								{
+							if (toolResults.length) {
+								currentMessages.push({
 									role: 'tool',
 									content: toolResults.map((toolResult) => {
-										const result = getToolResult(toolResult);
+										const resultForUser = convertToolResultForUser(toolResult);
 										return {
 											type: 'tool-result',
 											toolCallId: toolResult.toolCallId,
 											toolName: toolResult.toolName,
-											result: result.text,
+											result: toolResult.result,
 											// custom field
-											title: result.title,
+											title: resultForUser.title,
+											text: resultForUser.text,
 										};
 									}),
-								},
-							]);
-						}
-					},
-					onError(e) {
-						const error = e?.error || e;
-						let errorMessage;
-						if (APICallError.isInstance(error)) {
-							errorMessage =
-								'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
-						} else if (InvalidToolArgumentsError.isInstance(error)) {
-							errorMessage = `call ${error.toolName} failed: ${error.message}`;
-						} else {
-							console.error('Error in AI chat:', error);
-							errorMessage = 'Unknown error';
-						}
+								});
+							}
 
-						setMessages((prev) => [
-							...prev,
-							{ role: 'assistant', content: errorMessage },
-						]);
-					},
-				});
+							if (process.env.DEBUG === '1') {
+								console.log(
+									'---------------------------------------------------'
+								);
+								console.log('onStepFinish:');
+								console.log('text:', text);
+								console.log('toolCalls:', toolCalls);
+								console.log('toolResults:', toolResults);
+								console.log(
+									'---------------------------------------------------'
+								);
+							}
 
-				let fullMessage = '';
-				for await (const textPart of result.textStream) {
-					fullMessage += textPart;
-					// Estimate tokens: roughly 4 characters per token
-					const estimatedTokens = Math.ceil(fullMessage.length / 4);
-					setStreamingTokenCount(estimatedTokens);
-					setStreamingMessage(fullMessage); // Still store full message but won't display it
-					onChunk?.(textPart, fullMessage);
+							setMessages([...currentMessages]);
+						},
+						onError(e) {
+							const error = e?.error || e;
+							let errorMessage;
+							if (APICallError.isInstance(error)) {
+								errorMessage =
+									'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
+							} else if (InvalidToolArgumentsError.isInstance(error)) {
+								errorMessage = `call ${error.toolName} failed: ${error.message}`;
+							} else {
+								console.error('Error in AI chat:', error);
+								errorMessage = 'Unknown error';
+							}
+
+							currentMessages.push({
+								role: 'assistant',
+								content: errorMessage,
+							});
+							setMessages([...currentMessages]);
+						},
+					});
+
+					let fullMessage = '';
+					for await (const textPart of result.textStream) {
+						fullMessage += textPart;
+						// Estimate tokens: roughly 4 characters per token
+						const estimatedTokens = Math.ceil(fullMessage.length / 4);
+						setStreamingTokenCount(estimatedTokens);
+						setStreamingMessage(fullMessage); // Still store full message but won't display it
+						onChunk?.(textPart, fullMessage);
+					}
+
+					const len = currentMessages.length;
+					if (currentMessages[len - 1].role !== 'tool') {
+						break;
+					}
 				}
-
-				return fullMessage;
 			} catch (err) {
 				setError(err.message);
 				throw err;
@@ -188,11 +201,7 @@ export const useAIChat = (config = {}) => {
 			setMessages(updatedMessages);
 			setCurrentInput('');
 
-			sendMessage(updatedMessages, (chunk, fullMessage) => {})
-				.then((fullResponse) => {})
-				.catch((err) => {
-					// Error handled by useAIChat hook
-				});
+			sendMessage(updatedMessages);
 		}
 	};
 

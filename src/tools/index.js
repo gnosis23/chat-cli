@@ -20,7 +20,7 @@ export const toolsObject = {
 	writeTodo: writeTodoTool,
 };
 
-export const getToolResult = (toolResult) => {
+export const convertToolResultForUser = (toolResult) => {
 	let result;
 	switch (toolResult.toolName) {
 		case 'fetch':

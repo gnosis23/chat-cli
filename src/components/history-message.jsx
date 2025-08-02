@@ -41,7 +41,7 @@ export const HistoryMessage = ({ message, index }) => {
 						</Text>
 						<Text>({tool.title})</Text>
 					</Box>
-					<Text color="gray">{tool.result}</Text>
+					<Text color="gray">{tool.text}</Text>
 				</Box>
 			</Box>
 		));

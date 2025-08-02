@@ -8,8 +8,11 @@ export const readFileTool = {
 		filePath: z.string().describe('The absolute path to the file to read'),
 		offset: z
 			.number()
+			.positive()
 			.optional()
-			.describe('The line number to start reading from (1-indexed)'),
+			.describe(
+				'The line number to start reading from (1-indexed), must be greater than 0'
+			),
 		limit: z
 			.number()
 			.optional()
