@@ -63,13 +63,35 @@ export const useAIChat = (config = {}) => {
 		setError('Message cancelled by user');
 	}, []);
 
-	const handleSubmit = (inputText) => {
+	const handleSubmit = async (inputText) => {
 		if (inputText.trim()) {
 			const words = inputText.trim().split(/\s+/);
 			if (words[0] && commands[words[0]]) {
 				const func = commands[words[0]].func;
-				func(config);
 				setCurrentInput('');
+				setIsLoading(true);
+				try {
+					const commandResult = await func(
+						config,
+						setMessages,
+						(textPart, fullMessage, estimatedTokens) => {
+							setStreamingTokenCount(estimatedTokens);
+							setStreamingMessage(fullMessage); // Still store full message but won't display it
+						}
+					);
+
+					if (commandResult)
+						setMessages((prev) => [
+							...prev,
+							{ role: 'assistant', content: commandResult },
+						]);
+				} catch (err) {
+					console.error(err);
+				} finally {
+					setStreamingMessage(null);
+					setStreamingTokenCount(0);
+					setIsLoading(false);
+				}
 				return;
 			}
 

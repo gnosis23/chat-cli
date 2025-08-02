@@ -1,6 +1,7 @@
 import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
+import { initCommand } from './init-command.js';
 
 function showHelp() {
 	const keys = Object.keys(commands);
@@ -15,6 +16,10 @@ function showHelp() {
 }
 
 export const commands = {
+	'/init': {
+		description: 'init project',
+		func: initCommand,
+	},
 	'/config': {
 		description: 'show config',
 		func: configCommand,

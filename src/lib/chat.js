@@ -112,8 +112,7 @@ export async function generateTextAuto({
 				const error = e?.error || e;
 				let errorMessage;
 				if (APICallError.isInstance(error)) {
-					errorMessage =
-						'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
+					errorMessage = `Unauthorized request. ${error.message} or set your $OPENROUTER_API_KEY.`;
 				} else if (InvalidToolArgumentsError.isInstance(error)) {
 					errorMessage = `call ${error.toolName} failed: ${error.message}`;
 				} else {
@@ -170,4 +169,6 @@ export async function generateTextAuto({
 		});
 		onChangeMessage?.([...currentMessages]);
 	}
+
+	return currentMessages;
 }
