@@ -36,17 +36,41 @@ async function executeCommand(command, timeout = 30000) {
 	}
 }
 
+const bashDescription = `
+Execute bash commands and return output with exit status
+
+Do not use this tool when:
+- read a file: use readFileTool instead
+- write a file: use writeFileTool instead
+- update a file: use updateFileTool instead
+- search text / grep: use grepTool instead
+- list files / glob: use globTool instead
+
+## Git
+
+When the user asks you to create a git commit, follow these steps carefully:
+- "git status" to ensure that all relevant files are tacked and staged, using "git add ..." as needed.
+- "git diff HEAD" to review all changes (including unstaged changes) to tracked files in work tree since last commit.
+- "git diff --staged" to review only staged changes when a partial commit makes sense or was requested by user.
+- "git log -n 3" to review recent commit messages and match their style (verbosity, formatting etc.)
+
+Combine shell commands whenever possible to save time/steps, e.g. "git status && git diff HEAD && git log -n 3".
+Always propose a draft commit message. Never just ask the user to give you the full commit message.
+Prefer commit messages that are clear, concise, and focused more on "why" and less on "what".
+Keep the user informed and ask for clarification or confirmation where needed.
+After each commit, confirm that it was successful by running "git status".
+If a commit fails, never attempt to work around the issues without being asked to do so.
+Never push changes to a remote repository without being asked explicitly by the user.
+
+## gh command
+
+Use the gh command via the Bash tool for ALL Github-related tasks like issues, pull requests.
+If given a Github URL use the gh command to get the information needed.
+
+`;
+
 export const bashTool = tool({
-	description: `
-		Execute bash commands and return output with exit status
-		
-		Do not use this tool when:
-		- read a file: use readFileTool instead
-		- write a file: use writeFileTool instead
-		- update a file: use updateFileTool instead
-		- search text / grep: use grepTool instead
-		- list files / glob: use globTool instead
-	`,
+	description: bashDescription,
 	parameters: z.object({
 		command: z.string().describe('The bash command to execute'),
 		timeout: z
