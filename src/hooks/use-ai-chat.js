@@ -166,14 +166,16 @@ export const useAIChat = (config = {}) => {
 					const finishReason = await streamResult.finishReason;
 					const usage = await streamResult.usage;
 
-					currentMessages.push({
-						role: 'gui',
-						content: [
-							{ type: 'finishReason', text: finishReason },
-							{ type: 'usage', usage },
-						],
-					});
-					setMessages([...currentMessages]);
+					if (process.env.DEBUG === '1') {
+						currentMessages.push({
+							role: 'gui',
+							content: [
+								{ type: 'finishReason', text: finishReason },
+								{ type: 'usage', usage },
+							],
+						});
+						setMessages([...currentMessages]);
+					}
 
 					if (['stop', 'error'].includes(finishReason)) {
 						break;
