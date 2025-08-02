@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Text, Static } from 'ink';
 import Spinner from 'ink-spinner';
 import { GAP_SIZE } from './constant.js';
@@ -18,6 +18,49 @@ export default function ChatApp({ config = {} }) {
 		isLoading,
 		error,
 	} = useAIChat(config);
+
+	// CLI mode: auto-submit initial prompt
+	useEffect(() => {
+		if (
+			config.cliMode &&
+			config.initialPrompt &&
+			!messages.some((m) => m.role === 'user')
+		) {
+			handleSubmit(config.initialPrompt);
+		}
+	}, [config.cliMode, config.initialPrompt, handleSubmit, messages]);
+
+	// CLI mode: don't show input box
+	if (config.cliMode) {
+		return (
+			<Box flexDirection="column" gap={0}>
+				{/* Message history */}
+				<Box marginBottom={1} minWidth={120}>
+					<Static items={messages}>
+						{(item, index) => (
+							<HistoryMessage key={index} message={item} index={index} />
+						)}
+					</Static>
+					{streamingMessage && (
+						<AIMessage
+							message={streamingMessage}
+							isStreaming={true}
+							tokenCount={streamingTokenCount}
+						/>
+					)}
+					{isLoading && !streamingMessage && (
+						<Box gap={GAP_SIZE} marginBottom={1}>
+							<Text color="white">
+								<Spinner type="dots" />
+							</Text>
+							<Text color="white">Thinking...</Text>
+						</Box>
+					)}
+					{error && <ErrorMessage error={error} />}
+				</Box>
+			</Box>
+		);
+	}
 
 	return (
 		<Box flexDirection="column" gap={0}>

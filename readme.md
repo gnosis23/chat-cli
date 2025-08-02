@@ -104,6 +104,8 @@ Type these commands directly in the chat interface:
 
 ## Usage
 
+### Interactive Mode
+
 Once running, simply type your message and press Enter to send. The AI bot will respond with simulated messages.
 
 **Basic Commands:**
@@ -118,6 +120,27 @@ Once running, simply type your message and press Enter to send. The AI bot will 
 - All standard text editing shortcuts work in the input field
 - Arrow keys for cursor navigation
 - Emacs-style keybindings (Ctrl+A, Ctrl+E, etc.)
+
+### CLI Mode
+
+Use CLI mode to send a prompt directly to the AI and exit immediately after receiving the response:
+
+```bash
+# Send a prompt and exit
+node dist/chat-cli.js -p "What is the capital of France?"
+
+# Or use the long form
+node dist/chat-cli.js --prompt "Explain quantum computing"
+
+# With custom model and temperature
+node dist/chat-cli.js -p "Write a haiku" --model deepseek-chat --temperature 0.9 -p "hello"
+```
+
+In CLI mode:
+- No welcome message is shown
+- User input is disabled
+- The program exits automatically after the AI response
+- Perfect for scripting and automation
 
 ## Configuration
 

@@ -47,6 +47,7 @@ export const useAIChat = (config = {}) => {
 	const [streamingTokenCount, setStreamingTokenCount] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [isComplete, setIsComplete] = useState(false);
 
 	const model =
 		config.model ||
@@ -185,9 +186,15 @@ export const useAIChat = (config = {}) => {
 				setIsLoading(false);
 				setStreamingMessage(null);
 				setStreamingTokenCount(0);
+				setIsComplete(true);
+
+				// Auto-exit in CLI mode after response is complete
+				if (config.cliMode) {
+					setTimeout(() => exit(), 100);
+				}
 			}
 		},
-		[model, config, isLoading]
+		[model, config, isLoading, exit]
 	);
 
 	const cancelMessage = useCallback(() => {
@@ -236,5 +243,6 @@ export const useAIChat = (config = {}) => {
 		streamingTokenCount,
 		isLoading,
 		error,
+		isComplete,
 	};
 };
