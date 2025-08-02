@@ -1,17 +1,19 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { commands } from '../commands';
-import { systemPrompt } from '../prompt.js';
+import { getSystemPrompt } from '../prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
-	const [messages, setMessages] = useState([
-		{
-			role: 'system',
-			content: systemPrompt,
-		},
-	]);
+	const [messages, setMessages] = useState(() => {
+		return [
+			{
+				role: 'system',
+				content: getSystemPrompt(true),
+			},
+		];
+	});
 	const [currentInput, setCurrentInput] = useState('');
 	const [streamingMessage, setStreamingMessage] = useState(null);
 	const [streamingTokenCount, setStreamingTokenCount] = useState(0);

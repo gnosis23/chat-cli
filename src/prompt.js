@@ -1,4 +1,7 @@
-export const systemPrompt = `
+import fs from 'fs';
+import path from 'path';
+
+const systemPrompt = `
 You are an interactive CLI agent specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
 
 ## Core Identity
@@ -132,3 +135,15 @@ assistant: The chat input logic is primarily handled in:
 - **src/app.js:5-10** - Root component wrapper
 </example>
 `;
+
+export function getSystemPrompt(custom) {
+	let text = systemPrompt;
+	if (custom) {
+		const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
+		if (fs.existsSync(absolutePath)) {
+			const markdown = fs.readFileSync(absolutePath, 'utf8');
+			text += `## Project Info\n\n<doc>${markdown.toString()}</doc>\n`;
+		}
+	}
+	return text;
+}
