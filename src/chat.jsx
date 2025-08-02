@@ -5,6 +5,7 @@ import { GAP_SIZE } from './constant.js';
 import { useAIChat } from './hooks/use-ai-chat.js';
 import { AIMessage, ErrorMessage } from './components/ai-message.jsx';
 import { HistoryMessage } from './components/history-message.jsx';
+import { CliMessage } from './components/cli-message.jsx';
 import TextInput from './components/text-input.jsx';
 
 export default function ChatApp({ config = {} }) {
@@ -33,30 +34,13 @@ export default function ChatApp({ config = {} }) {
 	// CLI mode: don't show input box
 	if (config.cliMode) {
 		return (
-			<Box flexDirection="column" gap={0}>
-				{/* Message history */}
-				<Box marginBottom={1} minWidth={120}>
+			<Box flexDirection="column">
+				<Box>
 					<Static items={messages}>
 						{(item, index) => (
-							<HistoryMessage key={index} message={item} index={index} />
+							<CliMessage key={index} message={item} index={index} cliMode />
 						)}
 					</Static>
-					{streamingMessage && (
-						<AIMessage
-							message={streamingMessage}
-							isStreaming={true}
-							tokenCount={streamingTokenCount}
-						/>
-					)}
-					{isLoading && !streamingMessage && (
-						<Box gap={GAP_SIZE} marginBottom={1}>
-							<Text color="white">
-								<Spinner type="dots" />
-							</Text>
-							<Text color="white">Thinking...</Text>
-						</Box>
-					)}
-					{error && <ErrorMessage error={error} />}
 				</Box>
 			</Box>
 		);
