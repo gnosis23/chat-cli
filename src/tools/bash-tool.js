@@ -105,11 +105,10 @@ export const bashToolInfo = (
 	{ stdout, stderr, exitCode, success }
 ) => {
 	const summary = success ? 'Command executed successfully' : 'Command failed';
-	const output =
-		stdout || stderr ? `\n\`\`\`\n${topOutput(stdout || stderr)}\n\`\`\`` : '';
+	const output = stdout || stderr ? `\n${topOutput(stdout || stderr)}\n` : '';
 
 	return {
 		title: `${command}`,
-		text: `${summary} (exit code: ${exitCode})${output}`,
+		text: success ? output : `${summary} (exit code: ${exitCode})`,
 	};
 };
