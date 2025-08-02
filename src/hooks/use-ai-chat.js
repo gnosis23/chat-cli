@@ -1,6 +1,5 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { createOpenAI } from '@ai-sdk/openai';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
@@ -19,20 +18,6 @@ export const useAIChat = (config = {}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [isComplete, setIsComplete] = useState(false);
-
-	const model =
-		config.model ||
-		process.env.CHATCLI_MODEL ||
-		'deepseek/deepseek-chat-v3-0324';
-
-	const openai = createOpenAI({
-		baseURL: 'https://openrouter.ai/api/v1',
-		apiKey: config.apiKey || process.env.OPENROUTER_API_KEY,
-		// custom settings, e.g.
-		headers: {
-			'X-Title': 'chat-cli',
-		},
-	});
 
 	const sendMessage = useCallback(
 		async (messages) => {
@@ -68,7 +53,7 @@ export const useAIChat = (config = {}) => {
 				}
 			}
 		},
-		[model, config, isLoading, exit]
+		[config, isLoading, exit]
 	);
 
 	const cancelMessage = useCallback(() => {
