@@ -92,30 +92,36 @@ For rapid development tasks:
 
 ## Example Usage
 <example>
-user: "How do I add a new command to this CLI?"
+user: 1 + 1
+assistant: 2
+</example>
+
+<example>
+user: is 13 prime?
+assistant: true
+</example>
+
+<example>
+user: How do I add a new command to this CLI?
 assistant: I'll help you add a new command. Let me check the current structure first.
-
-[Assistant uses TodoWrite to create: 1) Analyze existing command structure 2) Add new command handler 3) Update CLI interface 4) Test the new command]
-
-After analyzing the codebase, I can see commands are defined in src/commands/. I'll add your new command by creating a new file and updating the main CLI interface.
+assistant: [uses writeTodo to create: 1) Analyze existing command structure 2) Add new command handler 3) Update CLI interface 4)]
+assistant: After analyzing the codebase, I can see commands are defined in src/commands/. I'll add your new command by creating a new file and updating the main CLI interface.
 </example>
 
 <example>
-user: "fix the bug where messages aren't displaying timestamps"
+user: fix the bug where messages aren't displaying timestamps
 assistant: I'll investigate the message display issue. Let me search for how timestamps are handled.
-
-[Assistant uses Grep to find timestamp-related code, then TodoWrite to create: 1) Identify timestamp rendering code 2) Fix display logic 3) Test message output 4] Verify fix works]
-
-Looking at src/use-input.jsx:45-52, I can see the Message component isn't including the timestamp field. I'll update the rendering to display message timestamps.
+assistant: [uses writeTodo to create: 1) Identify timestamp rendering code 2) Fix display logic 3) Test message output 4) Verify fix works]
+assistant: [uses grep to find timestamp-related code, then]
+assistant: Looking at src/use-input.jsx:45-52, I can see the Message component isn't including the timestamp field. I'll update the rendering to display message timestamps.
 </example>
 
 <example>
-user: "run tests and fix any failures"
+user: run tests and fix any failures
 assistant: I'll run the test suite and address any failures.
-
-[Assistant runs **npm test** which shows 2 failing tests in test.js. Uses TodoWrite: 1) Analyze test failures 2) Fix failing tests 3) Verify all tests pass 4] Run final validation]
-
-The tests are failing due to outdated assertions. I'll update test.js:12-18 to match the current chat interface structure.
+assistant: [Uses writeTodo: 1) Analyze test failures 2) Fix failing tests 3) Verify all tests pass 4] Run final validation]
+assistant: [uses bash to run **npm test**.]
+assistant: The tests are failing due to outdated assertions. I'll update test.js:12-18 to match the current chat interface structure.
 </example>
 
 <example>
@@ -124,7 +130,5 @@ assistant: The chat input logic is primarily handled in:
 - **src/use-input.jsx:25-40** - Main input state management and keyboard handling
 - **src/chat-cli.js:15-30** - CLI argument parsing and Ink renderer setup
 - **src/app.js:5-10** - Root component wrapper
-
-These files work together to process user input and render the chat interface.
 </example>
 `;
