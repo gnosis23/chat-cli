@@ -34,7 +34,7 @@ const cli = meow(
 
 function printWelcome() {
 	console.log('');
-	console.log('  Chat CLI - 0.1.0');
+	console.log('  Chat CLI - 0.2.0');
 	console.log('');
 }
 

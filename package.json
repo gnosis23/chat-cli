@@ -1,6 +1,6 @@
 {
 	"name": "chat-cli",
-	"version": "1.0.0",
+	"version": "0.2.0",
 	"license": "MIT",
 	"bin": "dist/chat-cli.js",
 	"type": "module",
