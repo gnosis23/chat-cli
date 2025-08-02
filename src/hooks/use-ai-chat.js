@@ -76,7 +76,7 @@ export const useAIChat = (config = {}) => {
 			try {
 				// main loop
 				while (true) {
-					const result = streamText({
+					const streamResult = streamText({
 						model: openai.chat(model),
 						messages: convertToAISdkMessages(currentMessages),
 						temperature: config.temperature || 0.7,
@@ -153,7 +153,7 @@ export const useAIChat = (config = {}) => {
 					});
 
 					let fullMessage = '';
-					for await (const textPart of result.textStream) {
+					for await (const textPart of streamResult.textStream) {
 						fullMessage += textPart;
 						// Estimate tokens: roughly 4 characters per token
 						const estimatedTokens = Math.ceil(fullMessage.length / 4);
@@ -162,8 +162,8 @@ export const useAIChat = (config = {}) => {
 						onChunk?.(textPart, fullMessage);
 					}
 
-					const len = currentMessages.length;
-					if (currentMessages[len - 1].role !== 'tool') {
+					const finishReason = await streamResult.finishReason;
+					if (['stop', 'error'].includes(finishReason)) {
 						break;
 					}
 				}
