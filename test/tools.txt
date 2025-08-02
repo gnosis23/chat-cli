@@ -9,7 +9,13 @@ update version to 1.0.0 in package.json
 what is the default *system* messages in useaichat
 Replace `Typing` to other verbs, random
 find all jsx files
-summary this project and save to chat-cli.md
-创建一个html页面用来展示当前目录下的git提交频率，类似github profile里的图
 fetch top 10 titles from https://news.ycombinator.com/news, write to temp/news.md
 生成一份 https://manuals.omamix.org/1/read 的阅读报告，保存到 temp/omaku.md 中
+
+Complex Tasks:
+
+task-1:
+summary this project and save to chat-cli.md
+
+task-2:
+创建一个temp/git.html页面用来展示当前目录下的git提交频率：由365个正方形组成，每个代表一天，默认为白色，提交次数越多绿色越深；7行，从上到下，从左到右，最近的天数在最后；不要生成额外的js、css文件；可以<script>引用第三方库如d3.js；git数据是固定的，不需要动态获取；鼠标hover上去显示日期和次数
