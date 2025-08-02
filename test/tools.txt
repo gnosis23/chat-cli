@@ -1,3 +1,6 @@
+# Built-in Tools
+----------------
+
 weather in shanghai
 fetch top 10 titles from https://news.ycombinator.com/news
 fetch last 10 lines of package.json
@@ -12,7 +15,14 @@ find all jsx files
 fetch top 10 titles from https://news.ycombinator.com/news, write to temp/news.md
 生成一份 https://manuals.omamix.org/1/read 的阅读报告，保存到 temp/omaku.md 中
 
-Complex Tasks:
+
+# External Tools
+----------------
+
+check github issue: 1
+
+# Complex Tasks
+----------------
 
 task-1:
 summary this project and save to chat-cli.md
