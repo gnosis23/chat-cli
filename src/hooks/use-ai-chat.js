@@ -1,38 +1,9 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
-import { toolsObject, convertToolResultForUser } from '../tools';
 import { commands } from '../commands';
 import { systemPrompt } from '../prompt.js';
-
-const convertToAISdkMessages = (messages) => {
-	const list = messages
-		.filter((x) => x.role != 'gui')
-		.map((message) => {
-			if (message.role === 'tool') {
-				// remove title in content
-				return {
-					role: 'tool',
-					content: message.content.map((x) => ({
-						type: 'tool-result',
-						toolCallId: x.toolCallId,
-						toolName: x.toolName,
-						args: x.args,
-						result: x.result,
-					})),
-				};
-			}
-			return message;
-		});
-
-	if (process.env.DEBUG === '1') {
-		console.log('messages:');
-		console.log(JSON.stringify(list, null, 2));
-	}
-
-	return list;
-};
+import { generateTextAuto } from '../lib/chat.js';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
@@ -64,7 +35,7 @@ export const useAIChat = (config = {}) => {
 	});
 
 	const sendMessage = useCallback(
-		async (messages, onChunk) => {
+		async (messages) => {
 			if (isLoading) return;
 
 			setIsLoading(true);
@@ -72,115 +43,16 @@ export const useAIChat = (config = {}) => {
 			setStreamingMessage('');
 			setStreamingTokenCount(0);
 
-			const currentMessages = [...messages];
-
 			try {
-				// main loop
-				while (true) {
-					const streamResult = streamText({
-						model: openai.chat(model),
-						messages: convertToAISdkMessages(currentMessages),
-						temperature: config.temperature || 0.7,
-						tools: { ...config.tools, ...toolsObject },
-						onStepFinish({ text, toolCalls, toolResults }) {
-							if (text) {
-								currentMessages.push({ role: 'assistant', content: text });
-							}
-
-							if (toolCalls.length) {
-								currentMessages.push({
-									role: 'assistant',
-									content: toolCalls.map((toolCall) => ({
-										type: 'tool-call',
-										toolCallId: toolCall.toolCallId,
-										toolName: toolCall.toolName,
-										args: toolCall.args || {},
-									})),
-								});
-							}
-
-							if (toolResults.length) {
-								currentMessages.push({
-									role: 'tool',
-									content: toolResults.map((toolResult) => {
-										const resultForUser = convertToolResultForUser(toolResult);
-										return {
-											type: 'tool-result',
-											toolCallId: toolResult.toolCallId,
-											toolName: toolResult.toolName,
-											result: toolResult.result,
-											// custom field
-											title: resultForUser.title,
-											text: resultForUser.text,
-										};
-									}),
-								});
-							}
-
-							if (process.env.DEBUG === '1') {
-								console.log(
-									'---------------------------------------------------'
-								);
-								console.log('onStepFinish:');
-								console.log('text:', text);
-								console.log('toolCalls:', toolCalls);
-								console.log('toolResults:', toolResults);
-								console.log(
-									'---------------------------------------------------'
-								);
-							}
-
-							setMessages([...currentMessages]);
-						},
-						onError(e) {
-							const error = e?.error || e;
-							let errorMessage;
-							if (APICallError.isInstance(error)) {
-								errorMessage =
-									'Unauthorized request. Please set your $OPENROUTER_API_KEY.';
-							} else if (InvalidToolArgumentsError.isInstance(error)) {
-								errorMessage = `call ${error.toolName} failed: ${error.message}`;
-							} else {
-								console.error('Error in AI chat:', error);
-								errorMessage = 'Unknown error';
-							}
-
-							currentMessages.push({
-								role: 'assistant',
-								content: errorMessage,
-							});
-							setMessages([...currentMessages]);
-						},
-					});
-
-					let fullMessage = '';
-					for await (const textPart of streamResult.textStream) {
-						fullMessage += textPart;
-						// Estimate tokens: roughly 4 characters per token
-						const estimatedTokens = Math.ceil(fullMessage.length / 4);
+				await generateTextAuto({
+					config,
+					messages,
+					onChangeMessage: setMessages,
+					onChunk: (textPart, fullMessage, estimatedTokens) => {
 						setStreamingTokenCount(estimatedTokens);
 						setStreamingMessage(fullMessage); // Still store full message but won't display it
-						onChunk?.(textPart, fullMessage);
-					}
-
-					const finishReason = await streamResult.finishReason;
-					const usage = await streamResult.usage;
-
-					if (process.env.DEBUG === '1') {
-						currentMessages.push({
-							role: 'gui',
-							content: [
-								{ type: 'finishReason', text: finishReason },
-								{ type: 'usage', usage },
-							],
-						});
-						setMessages([...currentMessages]);
-					}
-
-					if (['stop', 'error'].includes(finishReason)) {
-						break;
-					}
-				}
+					},
+				});
 			} catch (err) {
 				setError(err.message);
 				throw err;
