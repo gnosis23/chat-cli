@@ -11,6 +11,7 @@ const colors = {
 	system: 'yellow',
 	tool: '#0098df',
 	error: 'red',
+	secondary: '#ccc',
 };
 
 const prefixes = {
@@ -19,11 +20,37 @@ const prefixes = {
 	system: '*',
 	tool: '#',
 	error: 'x',
+	info: '$',
 };
 
 export const HistoryMessage = ({ message, index }) => {
 	if (message.role === 'system') {
 		return null;
+	}
+
+	if (message.role === 'gui') {
+		return (
+			<Box marginBottom={1}>
+				<Text color="gray">{prefixes.info}</Text>
+				{message.content.map((msg, idx) => (
+					<Box key={`gui-${idx}`} flexDirection="column" paddingLeft={GAP_SIZE}>
+						<Box gap={1}>
+							<Text color={colors.secondary} bold>
+								{msg.type}:
+							</Text>
+							{msg.type === 'usage' ? (
+								<Text color={colors.secondary}>
+									promptTokens-{msg.usage?.promptTokens} completionTokens-
+									{msg.usage?.completionTokens}
+								</Text>
+							) : (
+								<Text color={colors.secondary}>{msg.text}</Text>
+							)}
+						</Box>
+					</Box>
+				))}
+			</Box>
+		);
 	}
 
 	if (message.role === 'tool') {

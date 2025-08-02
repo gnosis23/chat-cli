@@ -11,5 +11,5 @@ Replace `Typing` to other verbs, random
 find all jsx files
 summary this project and save to chat-cli.md
 创建一个html页面用来展示当前目录下的git提交频率，类似github profile里的图
-fetch top 10 titles from https://news.ycombinator.com/news, write to news.md
-生成一份 https://manuals.omamix.org/1/read 的阅读报告，保存到 omaku.md 中
+fetch top 10 titles from https://news.ycombinator.com/news, write to temp/news.md
+生成一份 https://manuals.omamix.org/1/read 的阅读报告，保存到 temp/omaku.md 中
