@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { commands } from '../commands';
+import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
 
@@ -20,6 +20,7 @@ export const useAIChat = (config = {}) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [isComplete, setIsComplete] = useState(false);
+	const [commands] = useState(() => getCommands());
 
 	const sendMessage = useCallback(
 		async (messages) => {

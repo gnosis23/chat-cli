@@ -3,19 +3,7 @@ import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
 import { initCommand } from './init-command.js';
 
-function showHelp() {
-	const keys = Object.keys(commands);
-	console.log('');
-	console.log('Chat-CLI');
-	console.log('');
-	console.log('Interactive Mode Commands:');
-	keys.forEach((key) => {
-		console.log(`  ${key} - ${commands[key].description}`);
-	});
-	console.log('\n');
-}
-
-export const commands = {
+const _commands = {
 	'/init': {
 		description: 'init project',
 		func: initCommand,
@@ -37,3 +25,19 @@ export const commands = {
 		func: showMcpCommand,
 	},
 };
+
+function showHelp() {
+	const keys = Object.keys(_commands);
+	console.log('');
+	console.log('Chat-CLI');
+	console.log('');
+	console.log('Interactive Mode Commands:');
+	keys.forEach((key) => {
+		console.log(`  ${key} - ${_commands[key].description}`);
+	});
+	console.log('\n');
+}
+
+export function getCommands() {
+	return {..._commands};
+}

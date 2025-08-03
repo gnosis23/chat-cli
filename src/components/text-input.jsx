@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useInput, Text, Box } from 'ink';
-import { commands } from '../commands/index.js';
+import { getCommands } from '../commands';
 
 const Input = ({ value, cursorPosition }) => {
 	const beforeCursor = value.slice(0, cursorPosition) || null;
@@ -29,6 +29,7 @@ export default function TextInput({
 	const [cursorPosition, setCursorPosition] = useState(0);
 	const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
 	const [showCommands, setShowCommands] = useState(false);
+	const [commands] = useState(() => getCommands());
 
 	const commandList = Object.keys(commands);
 	const filteredCommands = value.startsWith('/')
