@@ -15,6 +15,7 @@ find all jsx files
 fetch top 10 titles from https://news.ycombinator.com/news, write to temp/news.md
 生成一份 https://manuals.omamix.org/1/read 的阅读报告，保存到 temp/omaku.md 中
 copy hackernews.md in example to temp directory
+访问网页逻辑在哪个文件里
 
 
 # External Tools

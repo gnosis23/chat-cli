@@ -3,10 +3,14 @@ import { z } from 'zod';
 import { glob } from 'glob';
 
 export const globTool = tool({
-	description:
-		'glob files matching a pattern, ignoring node_modules and .git directories',
+	description: `
+		Search files matching a pattern, ignoring node_modules and .git directories
+		Use this tool when you need to find files by name patterns
+	`,
 	parameters: z.object({
-		pattern: z.string().describe('The glob pattern to match files'),
+		pattern: z
+			.string()
+			.describe('The glob pattern to match files like "/*.js" or "src/*.ts"'),
 	}),
 	execute: async ({ pattern }) => {
 		try {

@@ -5,7 +5,7 @@ import { exec } from 'child_process';
 const bashGrep = (pattern) => {
 	return new Promise((resolve, reject) => {
 		exec(
-			`grep -ri --exclude-dir={node_modules,.git} "${pattern}" .`,
+			`grep -Eri --exclude-dir={node_modules,.git} "${pattern}" .`,
 			(error, stdout, stderr) => {
 				if (error) {
 					reject(`Error executing grep: ${error.message}`);
@@ -30,7 +30,8 @@ const bashGrep = (pattern) => {
 
 export const grepTool = tool({
 	description: `
-    Grep files for a specific pattern using system grep command
+    Search file content for a specific pattern using system grep command
+		- support full regex syntax like "log.*Error", "funciton\s+\w+"
     - ignoring cases
     - with file paths and line number
     - ignoring node_modules and .git directories
