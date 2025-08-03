@@ -54,15 +54,14 @@ async function main() {
 
 	const config = await loadConfig();
 	await loadExternalCommands({ quiet });
-	loadPrompt({ quiet });
+	await loadPrompt({ quiet });
+	await initMcp({ config, quiet });
 
 	// CLI mode - skip welcome message and direct prompt
 	if (cli.flags.prompt) {
 		if (process.env.DEBUG === '1') {
 			printConfig(config);
 		}
-
-		await initMcp(config);
 
 		render(
 			React.createElement(App, {
@@ -81,8 +80,6 @@ async function main() {
 	if (process.env.DEBUG === '1') {
 		printConfig(config);
 	}
-
-	await initMcp(config);
 
 	render(React.createElement(App, { config: { ...config, ...cli.flags } }));
 }

@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 const systemPromptTemplate = `
@@ -139,28 +139,39 @@ assistant: The chat input logic is primarily handled in:
 let globalPrompt = null;
 let projectPrompt = null;
 
-export function loadPrompt({ quiet }) {
+export async function loadPrompt({ quiet }) {
 	let loaded = false;
 
-	// load global config file: $HOME/.chat-cli.md
-	const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
-	if (fs.existsSync(homeConfigPath)) {
-		const markdown = fs.readFileSync(homeConfigPath, 'utf8');
-		globalPrompt = markdown.toString();
-		if (!quiet) console.log('  Loaded global config: ~/.chat-cli.md');
-		loaded = true;
-	}
+	try {
+		// load global config file: $HOME/.chat-cli.md
+		const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
+		try {
+			await fs.access(homeConfigPath);
+			const markdown = await fs.readFile(homeConfigPath, 'utf8');
+			globalPrompt = markdown.toString();
+			if (!quiet) console.log('  Loaded global config: ~/.chat-cli.md');
+			loaded = true;
+		} catch (error) {
+			// File doesn't exist, ignore
+		}
 
-	// load project config file: ./chat-cli.md
-	const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
-	if (fs.existsSync(absolutePath)) {
-		const markdown = fs.readFileSync(absolutePath, 'utf8');
-		projectPrompt = markdown.toString();
-		if (!quiet) console.log('  Loaded project config: .chat-cli.md');
-		loaded = true;
-	}
+		// load project config file: ./chat-cli.md
+		const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
+		try {
+			await fs.access(absolutePath);
+			const markdown = await fs.readFile(absolutePath, 'utf8');
+			projectPrompt = markdown.toString();
+			if (!quiet) console.log('  Loaded project config: .chat-cli.md');
+			loaded = true;
+		} catch (error) {
+			// File doesn't exist, ignore
+		}
 
-	if (!quiet && loaded) console.log('');
+		if (!quiet && loaded) console.log('');
+	} catch (error) {
+		// Handle any unexpected errors
+		if (!quiet) console.error('Error loading prompts:', error.message);
+	}
 }
 
 export function getSystemPrompt({ custom }) {
