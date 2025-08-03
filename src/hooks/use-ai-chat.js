@@ -71,16 +71,19 @@ export const useAIChat = (config = {}) => {
 			const words = inputText.trim().split(/\s+/);
 			if (words[0] && commands[words[0]]) {
 				const func = commands[words[0]].func;
+				const args = words.slice(1).join(' ');
 				setCurrentInput('');
 				setIsLoading(true);
 				try {
 					const commandResult = await func({
 						config,
+						messages,
 						setMessages,
 						onChunk: (textPart, fullMessage, estimatedTokens) => {
 							setStreamingTokenCount(estimatedTokens);
 							setStreamingMessage(fullMessage); // Still store full message but won't display it
 						},
+						args,
 					});
 
 					if (commandResult)

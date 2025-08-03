@@ -3,6 +3,7 @@ import { render } from 'ink';
 import meow from 'meow';
 import { loadConfig, printConfig } from './lib/config.js';
 import { loadPrompt } from './lib/prompt.js';
+import { loadExternalCommands } from './commands/index.js';
 import { initMcp } from './mcp.js';
 import App from './app.jsx';
 
@@ -52,6 +53,7 @@ async function main() {
 	}
 
 	const config = await loadConfig();
+	await loadExternalCommands({ quiet });
 	loadPrompt({ quiet });
 
 	// CLI mode - skip welcome message and direct prompt

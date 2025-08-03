@@ -1,9 +1,13 @@
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { generateTextAuto } from '../lib/chat.js';
 import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
 import { initCommand } from './init-command.js';
 
-const _commands = {
+const builtinCommands = {
 	'/init': {
 		description: 'init project',
 		func: initCommand,
@@ -26,18 +30,124 @@ const _commands = {
 	},
 };
 
+const externalCommands = {};
+
 function showHelp() {
-	const keys = Object.keys(_commands);
+	const allCommands = { ...builtinCommands, ...externalCommands };
+	const keys = Object.keys(allCommands);
 	console.log('');
 	console.log('Chat-CLI');
 	console.log('');
 	console.log('Interactive Mode Commands:');
 	keys.forEach((key) => {
-		console.log(`  ${key} - ${_commands[key].description}`);
+		console.log(`  ${key} - ${allCommands[key].description}`);
 	});
 	console.log('\n');
 }
 
+function createCustomFunc(fileContent, commandName) {
+	return async function ({ config, messages, setMessages, onChunk, args }) {
+		if (typeof fileContent !== 'string') return;
+
+		// Replace template variables
+		let prompt = fileContent;
+		if (args) {
+			prompt = prompt.replaceAll('$ARGUMENTS', args);
+		}
+
+		// Add context about the command being executed
+		const fullPrompt = `${prompt}`;
+
+		const newMessages = [...messages, { role: 'user', content: fullPrompt }];
+
+		// update user input first
+		setMessages(newMessages);
+
+		await generateTextAuto({
+			config,
+			messages: newMessages,
+			onChangeMessage: setMessages,
+			onChunk,
+		});
+
+		// For external commands, we'll use the AI to process the prompt
+		// This can be extended to support more complex external command behaviors
+		return null;
+	};
+}
+
+export async function loadExternalCommands({ quiet, customDirs = [] }) {
+	try {
+		// Default commands directory
+		const defaultCommandsDir = path.join(os.homedir(), '.chat-cli', 'commands');
+		const commandDirs = [defaultCommandsDir, ...customDirs];
+
+		// Create default directory if it doesn't exist
+		if (!fs.existsSync(defaultCommandsDir)) {
+			fs.mkdirSync(defaultCommandsDir, { recursive: true });
+		}
+
+		let loadedCount = 0;
+
+		// Load commands from all directories
+		for (const commandsDir of commandDirs) {
+			if (!fs.existsSync(commandsDir)) {
+				continue;
+			}
+
+			// Read all .md files in the commands directory
+			const files = fs.readdirSync(commandsDir);
+			const mdFiles = files.filter((file) => file.endsWith('.md'));
+
+			for (const file of mdFiles) {
+				const filePath = path.join(commandsDir, file);
+				const commandName = '/' + path.basename(file, '.md');
+
+				// Skip if command already exists (first loaded wins)
+				if (externalCommands[commandName]) {
+					continue;
+				}
+
+				try {
+					const fileContent = fs.readFileSync(filePath, 'utf8');
+
+					// Generate description from first line of file or use filename
+					const firstLine = fileContent
+						.split('\n')[0]
+						.replace(/^#\s*/, '')
+						.trim();
+					const description = firstLine || `Custom command: ${commandName}`;
+
+					// Store the command
+					externalCommands[commandName] = {
+						description,
+						func: createCustomFunc(fileContent, commandName),
+					};
+
+					loadedCount++;
+					if (!quiet)
+						console.log(
+							`  Loaded external command: ${commandName} (${commandsDir})`
+						);
+				} catch (error) {
+					if (!quiet)
+						console.error(
+							`  Error loading external command ${commandName} from ${commandsDir}:`,
+							error.message
+						);
+				}
+			}
+		}
+
+		if (loadedCount > 0) {
+			if (!quiet) console.log('');
+		}
+	} catch (error) {
+		if (!quiet)
+			console.error('Error loading external commands:', error.message);
+	}
+}
+
 export function getCommands() {
-	return {..._commands};
+	return { ...externalCommands, ...builtinCommands };
 }

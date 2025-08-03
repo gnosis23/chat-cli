@@ -1,13 +1,9 @@
 import { generateTextAuto } from '../lib/chat';
-import { getSystemPrompt } from '../lib/prompt';
 
-export async function initCommand({ config, setMessages, onChunk }) {
+export async function initCommand({ config, messages, setMessages, onChunk }) {
 	try {
-		const messages = [
-			{
-				role: 'system',
-				content: getSystemPrompt({ custom: false }),
-			},
+		const newMessages = [
+			...messages,
 			{
 				role: 'user',
 				content: `
@@ -25,7 +21,7 @@ export async function initCommand({ config, setMessages, onChunk }) {
 		];
 		await generateTextAuto({
 			config,
-			messages,
+			messages: newMessages,
 			onChangeMessage: setMessages,
 			onChunk,
 		});
