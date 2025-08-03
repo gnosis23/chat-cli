@@ -73,14 +73,14 @@ export const useAIChat = (config = {}) => {
 				setCurrentInput('');
 				setIsLoading(true);
 				try {
-					const commandResult = await func(
+					const commandResult = await func({
 						config,
 						setMessages,
-						(textPart, fullMessage, estimatedTokens) => {
+						onChunk: (textPart, fullMessage, estimatedTokens) => {
 							setStreamingTokenCount(estimatedTokens);
 							setStreamingMessage(fullMessage); // Still store full message but won't display it
-						}
-					);
+						},
+					});
 
 					if (commandResult)
 						setMessages((prev) => [

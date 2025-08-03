@@ -1,7 +1,7 @@
 import { generateTextAuto } from '../lib/chat';
 import { getSystemPrompt } from '../prompt';
 
-export async function initCommand(config, setMessages, onChunk) {
+export async function initCommand({ config, setMessages, onChunk }) {
 	try {
 		const messages = [
 			{

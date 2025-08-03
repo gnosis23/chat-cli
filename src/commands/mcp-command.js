@@ -1,4 +1,4 @@
-export function showMcpCommand(config) {
+export function showMcpCommand({ config }) {
 	const keys = Object.keys(config.tools);
 	console.log('--------------------------------------');
 	console.log('Mcp Tools:');
