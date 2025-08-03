@@ -101,6 +101,7 @@ Type these commands directly in the chat interface:
 - **Build**: Babel with @babel/preset-react for JSX
 - **Testing**: AVA with ink-testing-library
 - **Styling**: Ink components with color support
+- **Command Architecture**: Modern ES6+ with object destructuring for cleaner parameter handling
 
 ## Usage
 
@@ -155,9 +156,78 @@ export OPENROUTER_API_KEY="your-api-key-here"
 
 You can obtain an API key from [OpenRouter](https://openrouter.ai/settings/keys).
 
+The CLI supports two types of configuration files for customizing the AI assistant behavior and system prompts:
+
+### Configuration Files
+
+#### 1. Global Configuration (`~/.chat-cli.md`)
+This file contains global instructions that apply to all projects and sessions. It's loaded from your home directory and affects the AI's behavior regardless of which directory you're in.
+
+**Location**: `~/.chat-cli.md` (Markdown format)
+
+**Example usage**:
+```markdown
+# Global AI Instructions
+
+## Personal Preferences
+- Always use TypeScript when possible
+- Prefer functional programming patterns
+- Use descriptive variable names
+
+## Project Standards
+- Follow conventional commits
+- Use 2 spaces for indentation
+- Prefer arrow functions over function declarations
+
+## Development Environment
+- Use pnpm for package management
+- Run tests before committing changes
+- Use VS Code as the primary editor
+```
+
+#### 2. Project Configuration (`./chat-cli.md`)
+This file contains project-specific instructions that are loaded when you're in a specific project directory. It overrides or extends the global configuration.
+
+**Location**: `./chat-cli.md` in your project root (Markdown format)
+
+**Example usage**:
+```markdown
+# Project-Specific AI Instructions
+
+## Project Overview
+This is a React-based e-commerce application using Next.js and TypeScript.
+
+## Coding Standards
+- Use Tailwind CSS for styling
+- Follow Next.js App Router conventions
+- Use React Server Components where appropriate
+- Implement proper TypeScript types
+
+## Dependencies
+- Next.js 14 with App Router
+- TypeScript 5.0+
+- Tailwind CSS 3.0+
+- Prisma for database ORM
+
+## Testing
+- Use Jest and React Testing Library
+- Write tests for all new components
+- Achieve 80%+ test coverage
+
+## API Standards
+- Use RESTful conventions
+- Implement proper error handling
+- Use Zod for validation
+```
+
+### Configuration Loading Order
+1. Global configuration (`~/.chat-cli.md`) is loaded first
+2. Project configuration (`./chat-cli.md`) is loaded second and can override global settings
+3. Both configurations are merged into the system prompt
+
 ### Mcp Servers
 
-Add `mcpServers` in `$HOME/.chat-cli.json`
+Add `mcpServers` in `~/.chat-cli.json` (JSON format for MCP server configuration):
 
 ```json
 {

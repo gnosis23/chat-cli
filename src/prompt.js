@@ -139,11 +139,27 @@ assistant: The chat input logic is primarily handled in:
 export function getSystemPrompt(custom) {
 	let text = systemPrompt;
 	if (custom) {
+		let loaded = false;
+
+		// load global config file: $HOME/.chat-cli.md
+		const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
+		if (fs.existsSync(homeConfigPath)) {
+			const markdown = fs.readFileSync(homeConfigPath, 'utf8');
+			text += `## Global Config\n\n<doc>${markdown.toString()}</doc>\n`;
+			console.log('  Loaded global config: $HOME/.chat-cli.md');
+			loaded = true;
+		}
+
+		// load project config file: ./chat-cli.md
 		const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
 		if (fs.existsSync(absolutePath)) {
 			const markdown = fs.readFileSync(absolutePath, 'utf8');
 			text += `## Project Info\n\n<doc>${markdown.toString()}</doc>\n`;
+			console.log('  Loaded project config: ./.chat-cli.md');
+			loaded = true;
 		}
+
+		if (loaded) console.log('');
 	}
 	return text;
 }
