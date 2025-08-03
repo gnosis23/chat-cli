@@ -1,10 +1,11 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { glob } from 'glob';
+import { getIgnorePatterns } from '../lib/gitignore.js';
 
 export const lsTool = tool({
 	description:
-		'Lists files and directories in a given path. The path parameter must be an absolute path, not a relative path.',
+		'Lists files and subdirectories in a given path. The path parameter must be an absolute path, not a relative path.',
 	parameters: z.object({
 		path: z
 			.string()
@@ -14,9 +15,10 @@ export const lsTool = tool({
 	}),
 	execute: async ({ path }) => {
 		try {
-			const pattern = path + (path.endsWith('/') ? '' : '/') + '*';
+			const pattern = path + (path.endsWith('/') ? '' : '/') + '**';
+			const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
 			const files = await glob(pattern, {
-				ignore: ['node_modules/**', '.git/**'],
+				ignore: ignorePatterns,
 			});
 			return { files };
 		} catch (error) {
