@@ -39,12 +39,27 @@ async function executeCommand(command, timeout = 30000) {
 const bashDescription = `
 Execute bash commands and return output with exit status
 
-Do not use this tool when:
-- read a file: use readFileTool instead
-- write a file: use writeFileTool instead
-- update a file: use updateFileTool instead
-- search text / grep: use grepTool instead
-- list files / glob: use globTool instead
+Before executing the command, please follow these steps:
+1. Directory Verification:
+	- If the command will create new directories or files, first use the LS tool to verify the parent directory exists and is the correct location
+	- For example, before running "mkdir foo/bar", first use LS to check that "foo" exists and is the intended parent directory
+2. Command Execution:
+	- Always quote file paths that contain spaces with double quotes (e.g., cd "path with spaces/file.txt")
+	- Examples of proper quoting:
+		* cd "/Users/name/My Documents" (correct)
+		* cd /Users/name/My Documents (incorrect - will fail)
+		* python "/path/with spaces/script.py" (correct)
+		* python /path/with spaces/script.py (incorrect - will fail)
+	- After ensuring proper quoting, execute the command.
+	- Capture the output of the command.
+
+Usage notes:
+- VERY IMPORTANT: You MUST avoid using search commands like "find" and "grep". Instead use Grep, Glob to search. 
+- VERY IMPORTANT: You MUST avoid read tools like "cat", "head", "tail", and "ls", and use ReadFile and LS to read files.
+- If you still need to run grep, STOP. ALWAYS USE ripgrep at "rg" first
+- write a file: use WriteFile instead
+- update a file: use UpdateFile instead
+
 
 ## Git
 

@@ -7,48 +7,53 @@ import { updateFileTool, updateFileToolInfo } from './update-file-tool.js';
 import { grepTool, grepToolInfo } from './grep-tool.js';
 import { globTool, globToolInfo } from './glob-tool.js';
 import { writeTodoTool, writeTodoToolInfo } from './write-todo-tool.js';
+import { lsTool, lsToolInfo } from './ls-tool.js';
 
 export const toolsObject = {
-	fetch: fetchTool,
-	weather: weatherTool,
-	bash: bashTool,
-	readFile: readFileTool,
-	writeFile: writeFileTool,
-	updateFile: updateFileTool,
-	grep: grepTool,
-	glob: globTool,
-	writeTodo: writeTodoTool,
+	Fetch: fetchTool,
+	Weather: weatherTool,
+	Bash: bashTool,
+	ReadFile: readFileTool,
+	WriteFile: writeFileTool,
+	UpdateFile: updateFileTool,
+	Grep: grepTool,
+	Glob: globTool,
+	WriteTodo: writeTodoTool,
+	LS: lsTool,
 };
 
 export const convertToolResultForUser = (toolResult) => {
 	let result;
 	switch (toolResult.toolName) {
-		case 'fetch':
+		case 'Fetch':
 			result = fetchToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'weather':
+		case 'Weather':
 			result = weatherToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'bash':
+		case 'Bash':
 			result = bashToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'readFile':
+		case 'ReadFile':
 			result = readFileToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'writeFile':
+		case 'WriteFile':
 			result = writeFileToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'updateFile':
+		case 'UpdateFile':
 			result = updateFileToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'grep':
+		case 'Grep':
 			result = grepToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'glob':
+		case 'Glob':
 			result = globToolInfo(toolResult.args, toolResult.result);
 			break;
-		case 'writeTodo':
+		case 'WriteTodo':
 			result = writeTodoToolInfo(toolResult.args, toolResult.result);
+			break;
+		case 'LS':
+			result = lsToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
 			result = {
