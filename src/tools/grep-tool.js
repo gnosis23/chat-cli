@@ -1,30 +1,33 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { exec } from 'child_process';
+import { getGitignorePatterns } from '../lib/gitignore.js';
 
-const bashGrep = (pattern) => {
+const bashGrep = (pattern, ignoreDirs = []) => {
+	// Build exclude-dir argument from ignore patterns
+	const excludeDirs = [...new Set(['node_modules', '.git', ...ignoreDirs])];
+	const excludeArg = excludeDirs.map((dir) => `--exclude-dir=${dir}`).join(' ');
+
 	return new Promise((resolve, reject) => {
-		exec(
-			`grep -Eri --exclude-dir={node_modules,.git} "${pattern}" .`,
-			(error, stdout, stderr) => {
-				if (error) {
-					reject(`Error executing grep: ${error.message}`);
-					return;
-				}
-				if (stderr) {
-					reject(`Grep error: ${stderr}`);
-					return;
-				}
-				const results = stdout
-					.trim()
-					.split('\n')
-					.map((line) => {
-						const [filePath, ...match] = line.split(':');
-						return { filePath, match: match.join(':') };
-					});
-				resolve(results);
+		exec(`grep -Eri ${excludeArg} "${pattern}" .`, (error, stdout, stderr) => {
+			if (error) {
+				reject(`Error executing grep: ${error.message}`);
+				return;
 			}
-		);
+			if (stderr) {
+				reject(`Grep error: ${stderr}`);
+				return;
+			}
+			const results = stdout
+				.trim()
+				.split('\n')
+				.filter((line) => line.trim()) // Filter out empty lines
+				.map((line) => {
+					const [filePath, ...match] = line.split(':');
+					return { filePath, match: match.join(':') };
+				});
+			resolve(results);
+		});
 	});
 };
 
@@ -41,7 +44,17 @@ export const grepTool = tool({
 	}),
 	execute: async ({ pattern }) => {
 		try {
-			const results = await bashGrep(pattern);
+			// Get gitignore patterns and extract directory patterns
+			const gitignorePatterns = getGitignorePatterns();
+			const ignoreDirs = gitignorePatterns
+				.filter((pattern) => pattern.includes('/') || pattern.endsWith('/**'))
+				.map((pattern) => pattern.replace('/**', '').replace('**/', ''))
+				.filter(
+					(pattern) =>
+						pattern && !pattern.includes('*') && !pattern.startsWith('!')
+				);
+
+			const results = await bashGrep(pattern, ignoreDirs);
 			return {
 				pattern: pattern,
 				list: results,

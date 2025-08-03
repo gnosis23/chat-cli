@@ -1,6 +1,7 @@
 import { tool } from 'ai';
 import { z } from 'zod';
 import { glob } from 'glob';
+import { getIgnorePatterns } from '../lib/gitignore.js';
 
 export const globTool = tool({
 	description: `
@@ -14,8 +15,9 @@ export const globTool = tool({
 	}),
 	execute: async ({ pattern }) => {
 		try {
+			const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
 			const files = await glob(pattern, {
-				ignore: ['node_modules/**', '.git/**'],
+				ignore: ignorePatterns,
 			});
 			return { files };
 		} catch (error) {
