@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from 'ink';
 import meow from 'meow';
 import { loadConfig, printConfig } from './lib/config.js';
+import { loadPrompt } from './lib/prompt.js';
 import { initMcp } from './mcp.js';
 import App from './app.jsx';
 
@@ -45,7 +46,13 @@ function printWelcome() {
 }
 
 async function main() {
+	const quiet = Boolean(cli.flags.prompt);
+	if (!quiet) {
+		printWelcome();
+	}
+
 	const config = await loadConfig();
+	loadPrompt({ quiet });
 
 	// CLI mode - skip welcome message and direct prompt
 	if (cli.flags.prompt) {
@@ -69,7 +76,6 @@ async function main() {
 	}
 
 	// Normal interactive mode
-	printWelcome();
 	if (process.env.DEBUG === '1') {
 		printConfig(config);
 	}

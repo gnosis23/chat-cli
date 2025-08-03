@@ -1,7 +1,7 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { commands } from '../commands';
-import { getSystemPrompt } from '../prompt.js';
+import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
 
 export const useAIChat = (config = {}) => {
@@ -10,7 +10,7 @@ export const useAIChat = (config = {}) => {
 		return [
 			{
 				role: 'system',
-				content: getSystemPrompt(true),
+				content: getSystemPrompt({ custom: true }),
 			},
 		];
 	});

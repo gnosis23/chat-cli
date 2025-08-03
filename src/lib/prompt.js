@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const systemPrompt = `
+const systemPromptTemplate = `
 You are an interactive CLI agent specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
 
 ## Core Identity
@@ -136,30 +136,45 @@ assistant: The chat input logic is primarily handled in:
 </example>
 `;
 
-export function getSystemPrompt(custom) {
-	let text = systemPrompt;
-	if (custom) {
-		let loaded = false;
+let globalPrompt = null;
+let projectPrompt = null;
 
+export function loadPrompt({ quiet }) {
+	let loaded = false;
+
+	// load global config file: $HOME/.chat-cli.md
+	const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
+	if (fs.existsSync(homeConfigPath)) {
+		const markdown = fs.readFileSync(homeConfigPath, 'utf8');
+		globalPrompt = markdown.toString();
+		if (!quiet) console.log('  Loaded global config: ~/.chat-cli.md');
+		loaded = true;
+	}
+
+	// load project config file: ./chat-cli.md
+	const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
+	if (fs.existsSync(absolutePath)) {
+		const markdown = fs.readFileSync(absolutePath, 'utf8');
+		projectPrompt = markdown.toString();
+		if (!quiet) console.log('  Loaded project config: .chat-cli.md');
+		loaded = true;
+	}
+
+	if (!quiet && loaded) console.log('');
+}
+
+export function getSystemPrompt({ custom }) {
+	let text = systemPromptTemplate;
+	if (custom) {
 		// load global config file: $HOME/.chat-cli.md
-		const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
-		if (fs.existsSync(homeConfigPath)) {
-			const markdown = fs.readFileSync(homeConfigPath, 'utf8');
-			text += `## Global Config\n\n<doc>${markdown.toString()}</doc>\n`;
-			console.log('  Loaded global config: $HOME/.chat-cli.md');
-			loaded = true;
+		if (globalPrompt) {
+			text += `## Global Config\n\n<doc>${globalPrompt}</doc>\n`;
 		}
 
 		// load project config file: ./chat-cli.md
-		const absolutePath = path.resolve(process.cwd(), 'chat-cli.md');
-		if (fs.existsSync(absolutePath)) {
-			const markdown = fs.readFileSync(absolutePath, 'utf8');
-			text += `## Project Info\n\n<doc>${markdown.toString()}</doc>\n`;
-			console.log('  Loaded project config: ./.chat-cli.md');
-			loaded = true;
+		if (projectPrompt) {
+			text += `## Project config\n\n<doc>${projectPrompt}</doc>\n`;
 		}
-
-		if (loaded) console.log('');
 	}
 	return text;
 }

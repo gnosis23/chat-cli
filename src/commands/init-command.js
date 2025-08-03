@@ -1,12 +1,12 @@
 import { generateTextAuto } from '../lib/chat';
-import { getSystemPrompt } from '../prompt';
+import { getSystemPrompt } from '../lib/prompt';
 
 export async function initCommand({ config, setMessages, onChunk }) {
 	try {
 		const messages = [
 			{
 				role: 'system',
-				content: getSystemPrompt(false),
+				content: getSystemPrompt({ custom: false }),
 			},
 			{
 				role: 'user',
