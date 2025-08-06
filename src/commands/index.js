@@ -46,7 +46,14 @@ function showHelp() {
 }
 
 function createCustomFunc(fileContent, commandName) {
-	return async function ({ config, messages, setMessages, onChunk, args }) {
+	return async function ({
+		config,
+		messages,
+		setMessages,
+		onChunk,
+		args,
+		onSelect,
+	}) {
 		if (typeof fileContent !== 'string') return;
 
 		// Replace template variables
@@ -68,6 +75,7 @@ function createCustomFunc(fileContent, commandName) {
 			messages: newMessages,
 			onChangeMessage: setMessages,
 			onChunk,
+			onSelect,
 		});
 
 		// For external commands, we'll use the AI to process the prompt

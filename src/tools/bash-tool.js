@@ -93,17 +93,18 @@ export const bashTool = tool({
 			.optional()
 			.describe('Timeout in milliseconds (default: 30000)'),
 	}),
-	execute: async ({ command, timeout = 30000 }) => {
-		const result = await executeCommand(command, timeout);
-		return {
-			command: result.command,
-			stdout: result.stdout,
-			stderr: result.stderr,
-			exitCode: result.exitCode,
-			success: result.success,
-		};
-	},
 });
+
+export const bashExecute = async ({ command, timeout = 30000 }) => {
+	const result = await executeCommand(command, timeout);
+	return {
+		command: result.command,
+		stdout: result.stdout,
+		stderr: result.stderr,
+		exitCode: result.exitCode,
+		success: result.success,
+	};
+};
 
 function topOutput(output) {
 	if (!output) return '';

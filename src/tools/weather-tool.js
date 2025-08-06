@@ -6,10 +6,11 @@ export const weatherTool = tool({
 	parameters: z.object({
 		city: z.string().describe('The city name to get the weather for'),
 	}),
-	execute: async ({ city }) => ({
-		city,
-		temperature: 33,
-	}),
+});
+
+export const weatherExecute = async ({ city }) => ({
+	city,
+	temperature: 33,
 });
 
 export const weatherToolInfo = ({ city }, { temperature }) => {

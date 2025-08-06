@@ -1,5 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
+import { toolsExecute } from '../tools';
 import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
@@ -22,6 +23,10 @@ export const useAIChat = (config = {}) => {
 	const [isComplete, setIsComplete] = useState(false);
 	const [commands] = useState(() => getCommands());
 
+	const handleUserSelect = (tool) => {
+		console.log('onSelect', tool);
+	};
+
 	const sendMessage = useCallback(
 		async (messages) => {
 			if (isLoading) return;
@@ -40,6 +45,7 @@ export const useAIChat = (config = {}) => {
 						setStreamingTokenCount(estimatedTokens);
 						setStreamingMessage(fullMessage); // Still store full message but won't display it
 					},
+					onSelect: handleUserSelect,
 				});
 			} catch (err) {
 				setError(err.message);
@@ -84,6 +90,7 @@ export const useAIChat = (config = {}) => {
 							setStreamingMessage(fullMessage); // Still store full message but won't display it
 						},
 						args,
+						onSelect: handleUserSelect,
 					});
 
 					if (commandResult)

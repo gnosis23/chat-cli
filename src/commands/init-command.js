@@ -1,6 +1,12 @@
 import { generateTextAuto } from '../lib/chat';
 
-export async function initCommand({ config, messages, setMessages, onChunk }) {
+export async function initCommand({
+	config,
+	messages,
+	setMessages,
+	onChunk,
+	onSelect,
+}) {
 	try {
 		const newMessages = [
 			...messages,
@@ -24,6 +30,7 @@ export async function initCommand({ config, messages, setMessages, onChunk }) {
 			messages: newMessages,
 			onChangeMessage: setMessages,
 			onChunk,
+			onSelect,
 		});
 	} catch (err) {
 		console.log(err?.message);

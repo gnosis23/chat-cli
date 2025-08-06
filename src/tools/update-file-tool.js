@@ -9,23 +9,24 @@ export const updateFileTool = {
 		oldString: z.string().describe('string to replace'),
 		newString: z.string().describe('new string to replace with'),
 	}),
-	execute: async ({ filePath, oldString, newString }) => {
-		try {
-			const fileContent = await fs.readFile(filePath, 'utf-8');
-			const updatedContent = fileContent.replace(oldString, newString);
-			await fs.writeFile(filePath, updatedContent, 'utf-8');
-			return {
-				success: true,
-				message: `File updated successfully at ${filePath}`,
-				replaced: newString,
-			};
-		} catch (error) {
-			return {
-				success: false,
-				message: `Failed to update file: ${error.message}`,
-			};
-		}
-	},
+};
+
+export const updateFileExecute = async ({ filePath, oldString, newString }) => {
+	try {
+		const fileContent = await fs.readFile(filePath, 'utf-8');
+		const updatedContent = fileContent.replace(oldString, newString);
+		await fs.writeFile(filePath, updatedContent, 'utf-8');
+		return {
+			success: true,
+			message: `File updated successfully at ${filePath}`,
+			replaced: newString,
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message: `Failed to update file: ${error.message}`,
+		};
+	}
 };
 
 export const updateFileToolInfo = (

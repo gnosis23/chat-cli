@@ -35,6 +35,7 @@ export async function generateTextAuto({
 	messages,
 	onChangeMessage,
 	onChunk,
+	onSelect,
 }) {
 	const currentMessages = [...messages];
 
@@ -138,6 +139,24 @@ export async function generateTextAuto({
 
 		const finishReason = await streamResult.finishReason;
 		const usage = await streamResult.usage;
+
+		const lastMessage = currentMessages[currentMessages.length - 1];
+		const { role: lastType, content: lastContent } = lastMessage;
+		if (
+			lastType === 'assistant' &&
+			Array.isArray(lastContent) &&
+			lastContent[0].type === 'tool-call'
+		) {
+			if (
+				['Weather', 'Bash', 'WriteFile', 'UpdateFile'].includes(
+					lastContent[0].toolName
+				)
+			) {
+				// wait for user select
+				onSelect(lastContent[0]);
+				break;
+			}
+		}
 
 		if (process.env.DEBUG === '1') {
 			currentMessages.push({

@@ -1,9 +1,21 @@
 import { fetchTool, fetchToolInfo } from './fetch-tool.js';
-import { weatherTool, weatherToolInfo } from './weather-tool.js';
-import { bashTool, bashToolInfo } from './bash-tool.js';
+import {
+	weatherExecute,
+	weatherTool,
+	weatherToolInfo,
+} from './weather-tool.js';
+import { bashExecute, bashTool, bashToolInfo } from './bash-tool.js';
 import { readFileTool, readFileToolInfo } from './read-file-tool.js';
-import { writeFileTool, writeFileToolInfo } from './write-file-tool.js';
-import { updateFileTool, updateFileToolInfo } from './update-file-tool.js';
+import {
+	writeFileExecute,
+	writeFileTool,
+	writeFileToolInfo,
+} from './write-file-tool.js';
+import {
+	updateFileExecute,
+	updateFileTool,
+	updateFileToolInfo,
+} from './update-file-tool.js';
 import { grepTool, grepToolInfo } from './grep-tool.js';
 import { globTool, globToolInfo } from './glob-tool.js';
 import { writeTodoTool, writeTodoToolInfo } from './write-todo-tool.js';
@@ -20,6 +32,13 @@ export const toolsObject = {
 	Glob: globTool,
 	WriteTodo: writeTodoTool,
 	LS: lsTool,
+};
+
+export const toolsExecute = {
+	Weather: weatherExecute,
+	Bash: bashExecute,
+	WriteFile: writeFileExecute,
+	UpdateFile: updateFileExecute,
 };
 
 export const convertToolResultForUser = (toolResult) => {
