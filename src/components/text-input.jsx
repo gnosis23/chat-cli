@@ -25,6 +25,7 @@ export default function TextInput({
 	placeholder = '',
 	prefix = '> ',
 	isLoading,
+	autoAcceptMode = false,
 }) {
 	const [cursorPosition, setCursorPosition] = useState(0);
 	const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
@@ -252,11 +253,14 @@ export default function TextInput({
 
 			{/* Help text - hidden when commands are shown */}
 			{!showCommands && (
-				<Box marginBottom={1}>
+				<Box display="flex" justifyContent="space-between" marginBottom={1}>
 					<Text color="white" dimColor>
 						{isLoading
 							? 'Press Ctrl+C to cancel'
-							: 'Press Enter to send | Press Ctrl+C to exit | "/" to list commands'}
+							: `Press Enter to send | Press Ctrl+C to exit | "/" to list commands`}
+					</Text>
+					<Text color="white" dimColor>
+						{autoAcceptMode ? 'Auto-Accept Mode' : 'Manual Mode'} (shift + Tab)
 					</Text>
 				</Box>
 			)}

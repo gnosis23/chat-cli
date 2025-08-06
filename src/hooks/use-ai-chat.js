@@ -24,10 +24,17 @@ export const useAIChat = (config = {}) => {
 	const [commands] = useState(() => getCommands());
 	const [pendingToolCall, setPendingToolCall] = useState(null);
 	const [isToolSelectionActive, setIsToolSelectionActive] = useState(false);
+	const [autoAcceptMode, setAutoAcceptMode] = useState(false);
 
 	const handleUserSelect = (tool) => {
 		setPendingToolCall(tool);
-		setIsToolSelectionActive(true);
+
+		if (autoAcceptMode) {
+			// Auto-accept the tool call when auto accept mode is enabled
+			handleToolAccept(tool);
+		} else {
+			setIsToolSelectionActive(true);
+		}
 	};
 
 	const sendMessage = useCallback(
@@ -65,7 +72,7 @@ export const useAIChat = (config = {}) => {
 				}
 			}
 		},
-		[config, isLoading, exit]
+		[config, isLoading, exit, autoAcceptMode]
 	);
 
 	const cancelMessage = useCallback(() => {
@@ -75,47 +82,49 @@ export const useAIChat = (config = {}) => {
 		setError('Message cancelled by user');
 	}, []);
 
-	const handleToolAccept = useCallback(async () => {
-		if (!pendingToolCall) return;
+	const handleToolAccept = useCallback(
+		async (toolCall) => {
+			const _pendingToolCall = toolCall || pendingToolCall;
+			if (!_pendingToolCall) return;
 
-		setIsToolSelectionActive(false);
-		setIsLoading(true);
+			setIsToolSelectionActive(false);
 
-		try {
-			// Execute the tool call
-			const executeFn = toolsExecute[pendingToolCall.toolName];
-			if (!executeFn) {
-				throw new Error(`Tool ${pendingToolCall.toolName} not found`);
+			try {
+				// Execute the tool call
+				const executeFn = toolsExecute[_pendingToolCall.toolName];
+				if (!executeFn) {
+					throw new Error(`Tool ${_pendingToolCall.toolName} not found`);
+				}
+				const result = await executeFn(_pendingToolCall.args);
+
+				// Add tool result to messages
+				const toolResultMessage = {
+					role: 'tool',
+					content: [
+						{
+							type: 'tool-result',
+							toolCallId: _pendingToolCall.toolCallId,
+							toolName: _pendingToolCall.toolName,
+							result: result,
+							title: `${_pendingToolCall.toolName} executed`,
+							text: JSON.stringify(result, null, 2),
+						},
+					],
+				};
+
+				const updatedMessages = [...messages, toolResultMessage];
+				setMessages(updatedMessages);
+
+				// Continue the conversation
+				await sendMessage(updatedMessages);
+			} catch (err) {
+				setError(`Tool execution failed: ${err.message}`);
+			} finally {
+				setPendingToolCall(null);
 			}
-			const result = await executeFn(pendingToolCall.args);
-
-			// Add tool result to messages
-			const toolResultMessage = {
-				role: 'tool',
-				content: [
-					{
-						type: 'tool-result',
-						toolCallId: pendingToolCall.toolCallId,
-						toolName: pendingToolCall.toolName,
-						result: result,
-						title: `${pendingToolCall.toolName} executed`,
-						text: JSON.stringify(result, null, 2),
-					},
-				],
-			};
-
-			const updatedMessages = [...messages, toolResultMessage];
-			setMessages(updatedMessages);
-
-			// Continue the conversation
-			await sendMessage(updatedMessages);
-		} catch (err) {
-			setError(`Tool execution failed: ${err.message}`);
-		} finally {
-			setPendingToolCall(null);
-			setIsLoading(false);
-		}
-	}, [pendingToolCall, messages, sendMessage]);
+		},
+		[pendingToolCall, messages, sendMessage]
+	);
 
 	const handleToolDecline = useCallback(() => {
 		if (!pendingToolCall) return;
@@ -186,6 +195,12 @@ export const useAIChat = (config = {}) => {
 			return;
 		}
 
+		// Toggle auto accept mode with shift+tab
+		if (key.shift && key.tab) {
+			setAutoAcceptMode((prev) => !prev);
+			return;
+		}
+
 		if (key.ctrl && input === 'c') {
 			if (isLoading) {
 				cancelMessage();
@@ -210,5 +225,7 @@ export const useAIChat = (config = {}) => {
 		isToolSelectionActive,
 		handleToolAccept,
 		handleToolDecline,
+		autoAcceptMode,
+		setAutoAcceptMode,
 	};
 };

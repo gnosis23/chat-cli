@@ -45,7 +45,7 @@ export default function ToolSelection({ toolCall, onAccept, onDecline }) {
 					</Box>
 				</Box>
 
-				<Box flexDirection="column" marginTop={1}>
+				<Box flexDirection="column" marginTop={1} marginBottom={1}>
 					<Box>
 						<Text color={selectedIndex === 0 ? 'gray' : 'white'}>
 							{selectedIndex === 0 ? '➤ ' : '  '}Accept
@@ -59,9 +59,7 @@ export default function ToolSelection({ toolCall, onAccept, onDecline }) {
 					</Box>
 				</Box>
 
-				<Text dimColor marginTop={1}>
-					Use ↑/↓ arrows to select, Enter to confirm
-				</Text>
+				<Text dimColor>Use ↑/↓ arrows to select, Enter to confirm</Text>
 			</Box>
 		</Box>
 	);
