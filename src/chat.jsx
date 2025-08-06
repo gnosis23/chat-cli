@@ -7,6 +7,7 @@ import { AIMessage, ErrorMessage } from './components/ai-message.jsx';
 import { HistoryMessage } from './components/history-message.jsx';
 import { CliMessage } from './components/cli-message.jsx';
 import TextInput from './components/text-input.jsx';
+import ToolSelection from './components/tool-selection.jsx';
 
 export default function ChatApp({ config = {} }) {
 	const {
@@ -18,6 +19,10 @@ export default function ChatApp({ config = {} }) {
 		streamingTokenCount,
 		isLoading,
 		error,
+		pendingToolCall,
+		isToolSelectionActive,
+		handleToolAccept,
+		handleToolDecline,
 	} = useAIChat(config);
 
 	// CLI mode: auto-submit initial prompt
@@ -73,14 +78,25 @@ export default function ChatApp({ config = {} }) {
 				{error && <ErrorMessage error={error} />}
 			</Box>
 
-			{/* Input box */}
-			<TextInput
-				value={currentInput}
-				onChange={setCurrentInput}
-				onSubmit={handleSubmit}
-				prefix="> "
-				isLoading={isLoading}
-			/>
+			{/* Tool Selection */}
+			{isToolSelectionActive && pendingToolCall && (
+				<ToolSelection
+					toolCall={pendingToolCall}
+					onAccept={handleToolAccept}
+					onDecline={handleToolDecline}
+				/>
+			)}
+
+			{/* Input box - hidden when tool selection is active */}
+			{!isToolSelectionActive && (
+				<TextInput
+					value={currentInput}
+					onChange={setCurrentInput}
+					onSubmit={handleSubmit}
+					prefix="> "
+					isLoading={isLoading}
+				/>
+			)}
 		</Box>
 	);
 }

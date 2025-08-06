@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { toolsExecute } from '../tools';
+import { toolsExecute } from '../tools/index.js';
 import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
@@ -22,9 +22,12 @@ export const useAIChat = (config = {}) => {
 	const [error, setError] = useState(null);
 	const [isComplete, setIsComplete] = useState(false);
 	const [commands] = useState(() => getCommands());
+	const [pendingToolCall, setPendingToolCall] = useState(null);
+	const [isToolSelectionActive, setIsToolSelectionActive] = useState(false);
 
 	const handleUserSelect = (tool) => {
-		console.log('onSelect', tool);
+		setPendingToolCall(tool);
+		setIsToolSelectionActive(true);
 	};
 
 	const sendMessage = useCallback(
@@ -72,6 +75,66 @@ export const useAIChat = (config = {}) => {
 		setError('Message cancelled by user');
 	}, []);
 
+	const handleToolAccept = useCallback(async () => {
+		if (!pendingToolCall) return;
+
+		setIsToolSelectionActive(false);
+		setIsLoading(true);
+
+		try {
+			// Execute the tool call
+			const executeFn = toolsExecute[pendingToolCall.toolName];
+			if (!executeFn) {
+				throw new Error(`Tool ${pendingToolCall.toolName} not found`);
+			}
+			const result = await executeFn(pendingToolCall.args);
+
+			// Add tool result to messages
+			const toolResultMessage = {
+				role: 'tool',
+				content: [
+					{
+						type: 'tool-result',
+						toolCallId: pendingToolCall.toolCallId,
+						toolName: pendingToolCall.toolName,
+						result: result,
+						title: `${pendingToolCall.toolName} executed`,
+						text: JSON.stringify(result, null, 2),
+					},
+				],
+			};
+
+			const updatedMessages = [...messages, toolResultMessage];
+			setMessages(updatedMessages);
+
+			// Continue the conversation
+			await sendMessage(updatedMessages);
+		} catch (err) {
+			setError(`Tool execution failed: ${err.message}`);
+		} finally {
+			setPendingToolCall(null);
+			setIsLoading(false);
+		}
+	}, [pendingToolCall, messages, sendMessage]);
+
+	const handleToolDecline = useCallback(() => {
+		if (!pendingToolCall) return;
+
+		setIsToolSelectionActive(false);
+
+		// Add declined message
+		const declinedMessage = {
+			role: 'assistant',
+			content: `Tool call ${pendingToolCall.toolName} was declined by user.`,
+		};
+
+		const updatedMessages = [...messages, declinedMessage];
+		// Continue the conversation without the tool
+		setMessages(updatedMessages);
+
+		setPendingToolCall(null);
+	}, [pendingToolCall, messages, sendMessage]);
+
 	const handleSubmit = async (inputText) => {
 		if (inputText.trim()) {
 			const words = inputText.trim().split(/\s+/);
@@ -118,6 +181,11 @@ export const useAIChat = (config = {}) => {
 	};
 
 	useInput((input, key) => {
+		// Block input when tool selection is active
+		if (isToolSelectionActive) {
+			return;
+		}
+
 		if (key.ctrl && input === 'c') {
 			if (isLoading) {
 				cancelMessage();
@@ -138,5 +206,9 @@ export const useAIChat = (config = {}) => {
 		isLoading,
 		error,
 		isComplete,
+		pendingToolCall,
+		isToolSelectionActive,
+		handleToolAccept,
+		handleToolDecline,
 	};
 };
