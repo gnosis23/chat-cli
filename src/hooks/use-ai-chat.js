@@ -201,11 +201,7 @@ export const useAIChat = (config = {}) => {
 						onSelect: handleUserSelect,
 					});
 
-					if (commandResult)
-						setMessages((prev) => [
-							...prev,
-							{ role: 'assistant', content: commandResult },
-						]);
+					if (commandResult) setMessages((prev) => [...prev, commandResult]);
 				} catch (err) {
 					console.error(err);
 				} finally {

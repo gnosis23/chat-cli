@@ -32,23 +32,35 @@ export const HistoryMessage = ({ message, index }) => {
 		return (
 			<Box marginBottom={1}>
 				<Text color="gray">{prefixes.info}</Text>
-				{message.content.map((msg, idx) => (
-					<Box key={`gui-${idx}`} flexDirection="column" paddingLeft={GAP_SIZE}>
-						<Box gap={1}>
-							<Text color={colors.secondary} bold>
-								{msg.type}:
-							</Text>
-							{msg.type === 'usage' ? (
-								<Text color={colors.secondary}>
-									promptTokens-{msg.usage?.promptTokens} completionTokens-
-									{msg.usage?.completionTokens}
+				{Array.isArray(message.content) ? (
+					message.content.map((msg, idx) => (
+						<Box
+							key={`gui-${idx}`}
+							flexDirection="column"
+							paddingLeft={GAP_SIZE}
+						>
+							<Box gap={1}>
+								<Text color={colors.secondary} bold>
+									{msg.type}:
 								</Text>
-							) : (
-								<Text color={colors.secondary}>{msg.text}</Text>
-							)}
+								{msg.type === 'usage' ? (
+									<Text color={colors.secondary}>
+										promptTokens-{msg.usage?.promptTokens} completionTokens-
+										{msg.usage?.completionTokens}
+									</Text>
+								) : (
+									<Text color={colors.secondary}>{msg.text}</Text>
+								)}
+							</Box>
+						</Box>
+					))
+				) : (
+					<Box key={`gui-0`} flexDirection="column" paddingLeft={GAP_SIZE}>
+						<Box gap={1}>
+							<Text color={colors.secondary}>{message.content}</Text>
 						</Box>
 					</Box>
-				))}
+				)}
 			</Box>
 		);
 	}

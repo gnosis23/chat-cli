@@ -6,11 +6,16 @@ import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
 import { initCommand } from './init-command.js';
+import { clearCommand } from './clear-command.js';
 
 const builtinCommands = {
 	'/init': {
 		description: 'init project',
 		func: initCommand,
+	},
+	'/clear': {
+		description: 'clear session',
+		func: clearCommand,
 	},
 	'/config': {
 		description: 'show config',
