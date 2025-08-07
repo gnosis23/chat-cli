@@ -5,6 +5,37 @@ import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
 
+async function execute(pendingToolCall) {
+	// Execute the tool call
+	const executeFn = toolsExecute[pendingToolCall.toolName];
+	if (!executeFn) {
+		throw new Error(`Tool ${pendingToolCall.toolName} not found`);
+	}
+	const result = await executeFn(pendingToolCall.args);
+	const resultUser = convertToolResultForUser({
+		toolName: pendingToolCall.toolName,
+		args: pendingToolCall.args,
+		result,
+	});
+
+	// Add tool result to messages
+	const toolResultMessage = {
+		role: 'tool',
+		content: [
+			{
+				type: 'tool-result',
+				toolCallId: pendingToolCall.toolCallId,
+				toolName: pendingToolCall.toolName,
+				result: result,
+				title: `${resultUser.title}`,
+				text: resultUser.text,
+			},
+		],
+	};
+
+	return toolResultMessage;
+}
+
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
 	const [messages, setMessages] = useState(() => {
@@ -90,32 +121,32 @@ export const useAIChat = (config = {}) => {
 			setIsToolSelectionActive(false);
 
 			try {
-				// Execute the tool call
-				const executeFn = toolsExecute[_pendingToolCall.toolName];
-				if (!executeFn) {
-					throw new Error(`Tool ${_pendingToolCall.toolName} not found`);
-				}
-				const result = await executeFn(_pendingToolCall.args);
-				const resultUser = convertToolResultForUser({
-					toolName: _pendingToolCall.toolName,
-					args: _pendingToolCall.args,
-					result,
-				});
+				const toolResultMessage = await execute(_pendingToolCall);
 
-				// Add tool result to messages
-				const toolResultMessage = {
-					role: 'tool',
-					content: [
-						{
-							type: 'tool-result',
-							toolCallId: _pendingToolCall.toolCallId,
-							toolName: _pendingToolCall.toolName,
-							result: result,
-							title: `${resultUser.title}`,
-							text: resultUser.text,
-						},
-					],
-				};
+				const updatedMessages = [...messages, toolResultMessage];
+				setMessages(updatedMessages);
+
+				// Continue the conversation
+				await sendMessage(updatedMessages);
+			} catch (err) {
+				setError(`Tool execution failed: ${err.message}`);
+			} finally {
+				setPendingToolCall(null);
+			}
+		},
+		[pendingToolCall, messages, sendMessage]
+	);
+
+	const handleToolAcceptAuto = useCallback(
+		async (toolCall) => {
+			const _pendingToolCall = toolCall || pendingToolCall;
+			if (!_pendingToolCall) return;
+
+			setIsToolSelectionActive(false);
+			setAutoAcceptMode(true);
+
+			try {
+				const toolResultMessage = await execute(_pendingToolCall);
 
 				const updatedMessages = [...messages, toolResultMessage];
 				setMessages(updatedMessages);
@@ -229,6 +260,7 @@ export const useAIChat = (config = {}) => {
 		pendingToolCall,
 		isToolSelectionActive,
 		handleToolAccept,
+		handleToolAcceptAuto,
 		handleToolDecline,
 		autoAcceptMode,
 		setAutoAcceptMode,

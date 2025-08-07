@@ -2,19 +2,26 @@ import React, { useState } from 'react';
 import { Box, Text } from 'ink';
 import { useInput } from 'ink';
 
-export default function ToolSelection({ toolCall, onAccept, onDecline }) {
+export default function ToolSelection({
+	toolCall,
+	onAccept,
+	onAcceptAuto,
+	onDecline,
+}) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
 	useInput((input, key) => {
 		if (key.upArrow) {
-			setSelectedIndex(0); // Select Accept
+			setSelectedIndex((selectedIndex + 3 - 1) % 3); // Select Accept
 		}
 		if (key.downArrow) {
-			setSelectedIndex(1); // Select Decline
+			setSelectedIndex((selectedIndex + 1) % 3); // Select Decline
 		}
 		if (key.return) {
 			if (selectedIndex === 0) {
 				onAccept();
+			} else if (selectedIndex === 1) {
+				onAcceptAuto();
 			} else {
 				onDecline();
 			}
@@ -54,7 +61,13 @@ export default function ToolSelection({ toolCall, onAccept, onDecline }) {
 
 					<Box>
 						<Text color={selectedIndex === 1 ? '#0098df' : 'gray'}>
-							{selectedIndex === 1 ? '➤ ' : '  '}Decline
+							{selectedIndex === 1 ? '➤ ' : '  '}Accept + (Auto Mode)
+						</Text>
+					</Box>
+
+					<Box>
+						<Text color={selectedIndex === 2 ? '#0098df' : 'gray'}>
+							{selectedIndex === 2 ? '➤ ' : '  '}Decline
 						</Text>
 					</Box>
 				</Box>

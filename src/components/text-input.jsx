@@ -260,7 +260,7 @@ export default function TextInput({
 							: `Press Enter to send | Press Ctrl+C to exit | "/" to list commands`}
 					</Text>
 					<Text color="white" dimColor>
-						{autoAcceptMode ? 'Auto-Accept Mode' : 'Manual Mode'} (shift + Tab)
+						{autoAcceptMode ? 'Auto Mode' : 'Manual Mode'} (shift + Tab)
 					</Text>
 				</Box>
 			)}

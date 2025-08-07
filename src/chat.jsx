@@ -22,6 +22,7 @@ export default function ChatApp({ config = {} }) {
 		pendingToolCall,
 		isToolSelectionActive,
 		handleToolAccept,
+		handleToolAcceptAuto,
 		handleToolDecline,
 		autoAcceptMode,
 	} = useAIChat(config);
@@ -84,6 +85,7 @@ export default function ChatApp({ config = {} }) {
 				<ToolSelection
 					toolCall={pendingToolCall}
 					onAccept={handleToolAccept}
+					onAcceptAuto={handleToolAcceptAuto}
 					onDecline={handleToolDecline}
 				/>
 			)}
