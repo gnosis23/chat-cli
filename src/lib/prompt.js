@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import chalk from 'chalk';
 
 const systemPromptTemplate = `
 You are an interactive CLI agent specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
@@ -149,7 +150,8 @@ export async function loadPrompt({ quiet }) {
 			await fs.access(homeConfigPath);
 			const markdown = await fs.readFile(homeConfigPath, 'utf8');
 			globalPrompt = markdown.toString();
-			if (!quiet) console.log('  Loaded global config: ~/.chat-cli.md');
+			if (!quiet)
+				console.log(chalk.dim('  Loaded global config: ~/.chat-cli.md'));
 			loaded = true;
 		} catch (error) {
 			// File doesn't exist, ignore
@@ -161,7 +163,8 @@ export async function loadPrompt({ quiet }) {
 			await fs.access(absolutePath);
 			const markdown = await fs.readFile(absolutePath, 'utf8');
 			projectPrompt = markdown.toString();
-			if (!quiet) console.log('  Loaded project config: .chat-cli.md');
+			if (!quiet)
+				console.log(chalk.dim('  Loaded project config: .chat-cli.md'));
 			loaded = true;
 		} catch (error) {
 			// File doesn't exist, ignore

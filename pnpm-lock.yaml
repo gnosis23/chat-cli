@@ -14,6 +14,9 @@ importers:
       ai:
         specifier: ^4.3.19
         version: 4.3.19(react@18.3.1)(zod@3.25.76)
+      chalk:
+        specifier: ^5.2.0
+        version: 5.4.1
       dedent:
         specifier: ^1.6.0
         version: 1.6.0
@@ -45,9 +48,6 @@ importers:
       '@vdemedes/prettier-config':
         specifier: ^2.0.1
         version: 2.0.1
-      chalk:
-        specifier: ^5.2.0
-        version: 5.4.1
       import-jsx:
         specifier: ^5.0.0
         version: 5.0.0

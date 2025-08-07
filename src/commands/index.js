@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+import chalk from 'chalk';
 import { generateTextAuto } from '../lib/chat.js';
 import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
@@ -140,7 +141,9 @@ export async function loadExternalCommands({ quiet, customDirs = [] }) {
 					loadedCount++;
 					if (!quiet)
 						console.log(
-							`  Loaded external command: ${commandName} (${commandsDir})`
+							chalk.dim(
+								`  Loaded external command: ${commandName} (${commandsDir})`
+							)
 						);
 				} catch (error) {
 					if (!quiet)
