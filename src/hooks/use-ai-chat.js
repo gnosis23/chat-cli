@@ -1,6 +1,6 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { toolsExecute } from '../tools/index.js';
+import { convertToolResultForUser, toolsExecute } from '../tools/index.js';
 import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
@@ -96,6 +96,11 @@ export const useAIChat = (config = {}) => {
 					throw new Error(`Tool ${_pendingToolCall.toolName} not found`);
 				}
 				const result = await executeFn(_pendingToolCall.args);
+				const resultUser = convertToolResultForUser({
+					toolName: _pendingToolCall.toolName,
+					args: _pendingToolCall.args,
+					result,
+				});
 
 				// Add tool result to messages
 				const toolResultMessage = {
@@ -106,8 +111,8 @@ export const useAIChat = (config = {}) => {
 							toolCallId: _pendingToolCall.toolCallId,
 							toolName: _pendingToolCall.toolName,
 							result: result,
-							title: `${_pendingToolCall.toolName} executed`,
-							text: JSON.stringify(result, null, 2),
+							title: `${resultUser.title}`,
+							text: resultUser.text,
 						},
 					],
 				};

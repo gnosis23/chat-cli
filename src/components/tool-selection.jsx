@@ -40,20 +40,20 @@ export default function ToolSelection({ toolCall, onAccept, onDecline }) {
 					<Text>
 						<Text bold>Arguments:</Text>
 					</Text>
-					<Box marginLeft={2}>
+					<Box>
 						<Text>{JSON.stringify(toolCall.args, null, 2)}</Text>
 					</Box>
 				</Box>
 
 				<Box flexDirection="column" marginTop={1} marginBottom={1}>
 					<Box>
-						<Text color={selectedIndex === 0 ? 'gray' : 'white'}>
+						<Text color={selectedIndex === 0 ? '#0098df' : 'gray'}>
 							{selectedIndex === 0 ? '➤ ' : '  '}Accept
 						</Text>
 					</Box>
 
 					<Box>
-						<Text color={selectedIndex === 1 ? 'gray' : 'white'}>
+						<Text color={selectedIndex === 1 ? '#0098df' : 'gray'}>
 							{selectedIndex === 1 ? '➤ ' : '  '}Decline
 						</Text>
 					</Box>
