@@ -36,6 +36,11 @@ async function execute(pendingToolCall) {
 	return toolResultMessage;
 }
 
+async function doExecute(pendingToolCall, messages) {
+	const toolResultMessage = await execute(pendingToolCall);
+	return [...messages, toolResultMessage];
+}
+
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
 	const [messages, setMessages] = useState(() => {
@@ -121,9 +126,7 @@ export const useAIChat = (config = {}) => {
 			setIsToolSelectionActive(false);
 
 			try {
-				const toolResultMessage = await execute(_pendingToolCall);
-
-				const updatedMessages = [...messages, toolResultMessage];
+				const updatedMessages = await doExecute(_pendingToolCall, messages);
 				setMessages(updatedMessages);
 
 				// Continue the conversation
@@ -146,9 +149,7 @@ export const useAIChat = (config = {}) => {
 			setAutoAcceptMode(true);
 
 			try {
-				const toolResultMessage = await execute(_pendingToolCall);
-
-				const updatedMessages = [...messages, toolResultMessage];
+				const updatedMessages = await doExecute(_pendingToolCall, messages);
 				setMessages(updatedMessages);
 
 				// Continue the conversation
