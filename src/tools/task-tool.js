@@ -30,31 +30,31 @@ export const taskTool = tool({
 	}),
 });
 
-export const taskExecute = async ({ prompt }, { config, setMessages }) => {
+export const taskExecute = async ({ prompt }, { config, onAddMessage }) => {
 	try {
-		// setMessages((prev) => [
-		// 	...prev,
-		// 	{
-		// 		role: 'gui',
-		// 		content: [{ type: 'info', text: `task(${prompt}) created` }],
-		// 	},
-		// ]);
+		onAddMessage({
+			role: 'gui',
+			content: [{ type: 'info', text: `task(${prompt}) created` }],
+		});
 
-		const messages = [
-			{ role: 'system', content: getSystemPrompt({ custom: true }) },
-			{ role: 'user', content: prompt },
-		];
+		const messagesRef = {
+			current: [
+				{ role: 'system', content: getSystemPrompt({ custom: true }) },
+				{ role: 'user', content: prompt },
+			],
+		};
 
 		const resultMessages = await generateTextAuto({
-			config,
-			messages,
 			isTask: true,
-			onChangeMessage: (x) => {
+			config,
+			messagesRef,
+			onAddMessage: (x) => {
 				// if (process.env.DEBUG === '1') {
 				// 	console.log('---- onChangeMessage ----');
 				// 	console.log(JSON.stringify(lastAssistantContent(x), null, 2));
 				// 	console.log('\n');
 				// }
+				messagesRef.current.push(x);
 			},
 			onChunk: null,
 			onSelect: () => null,

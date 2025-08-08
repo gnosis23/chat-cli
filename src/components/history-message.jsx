@@ -99,7 +99,7 @@ export const HistoryMessage = ({ message, index }) => {
 				: null;
 
 	return (
-		<Box key={index} display="flex" marginBottom={1}>
+		<Box display="flex" marginBottom={1}>
 			<Text>{prefixes[message.role]}</Text>
 			<Box
 				flexDirection="column"

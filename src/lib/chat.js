@@ -2,6 +2,7 @@ import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { toolsObject, convertToolResultForUser } from '../tools';
 import { execute } from './tool-execution';
+import { lastAssistantMessage } from './message-util';
 
 const convertToAISdkMessages = (messages) => {
 	const list = messages
@@ -32,15 +33,13 @@ const convertToAISdkMessages = (messages) => {
 };
 
 export async function generateTextAuto({
-	config,
-	messages,
 	isTask = false,
-	onChangeMessage,
+	config,
+	messagesRef,
+	onAddMessage,
 	onChunk,
 	onSelect,
 }) {
-	let currentMessages = [...messages];
-
 	const model =
 		config.model ||
 		process.env.CHATCLI_MODEL ||
@@ -65,16 +64,16 @@ export async function generateTextAuto({
 
 		const streamResult = streamText({
 			model: openai.chat(model),
-			messages: convertToAISdkMessages(currentMessages),
+			messages: convertToAISdkMessages(messagesRef.current),
 			temperature: config.temperature || 0.7,
 			tools: tools,
 			onStepFinish({ text, toolCalls, toolResults }) {
 				if (text) {
-					currentMessages.push({ role: 'assistant', content: text });
+					onAddMessage({ role: 'assistant', content: text });
 				}
 
 				if (toolCalls.length) {
-					currentMessages.push({
+					onAddMessage({
 						role: 'assistant',
 						content: toolCalls.map((toolCall) => ({
 							type: 'tool-call',
@@ -86,7 +85,7 @@ export async function generateTextAuto({
 				}
 
 				if (toolResults.length) {
-					currentMessages.push({
+					onAddMessage({
 						role: 'tool',
 						content: toolResults.map((toolResult) => {
 							const resultForUser = convertToolResultForUser(toolResult);
@@ -111,8 +110,6 @@ export async function generateTextAuto({
 					console.log('toolResults:', toolResults);
 					console.log('---------------------------------------------------');
 				}
-
-				onChangeMessage?.([...currentMessages]);
 			},
 			onError(e) {
 				const error = e?.error || e;
@@ -126,11 +123,10 @@ export async function generateTextAuto({
 					errorMessage = 'Unknown error';
 				}
 
-				currentMessages.push({
+				onAddMessage({
 					role: 'assistant',
 					content: errorMessage,
 				});
-				onChangeMessage?.([...currentMessages]);
 			},
 		});
 
@@ -145,7 +141,7 @@ export async function generateTextAuto({
 		const finishReason = await streamResult.finishReason;
 		const usage = await streamResult.usage;
 
-		const lastMessage = currentMessages[currentMessages.length - 1];
+		const lastMessage = lastAssistantMessage(messagesRef.current);
 		const { role: lastType, content: lastContent } = lastMessage;
 		if (
 			lastType === 'assistant' &&
@@ -155,27 +151,24 @@ export async function generateTextAuto({
 			if (isTask) {
 				const result = await execute(lastContent[0], {
 					config,
-					messages: currentMessages,
-					setMessages: (msgs) => null,
+					onAddMessage: (msgs) => null,
 				});
-				currentMessages.push(result);
-				onChangeMessage?.([...currentMessages]);
+				onAddMessage(result);
 			} else {
 				// wait for user select
-				await onSelect(lastContent[0], currentMessages);
+				await onSelect(lastContent[0]);
 				break;
 			}
 		}
 
 		if (process.env.DEBUG === '1') {
-			currentMessages.push({
+			onAddMessage({
 				role: 'gui',
 				content: [
 					{ type: 'finishReason', text: finishReason },
 					{ type: 'usage', usage },
 				],
 			});
-			onChangeMessage?.([...currentMessages]);
 		}
 
 		// Can be one of the following:
@@ -191,12 +184,11 @@ export async function generateTextAuto({
 	}
 
 	if (maxStep === 0) {
-		currentMessages.push({
+		onAddMessage({
 			role: 'gui',
 			content: [{ type: 'maxStep', text: 'reach max step, continue?' }],
 		});
-		onChangeMessage?.([...currentMessages]);
 	}
 
-	return currentMessages;
+	return messagesRef.current;
 }

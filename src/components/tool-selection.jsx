@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { Box, Text } from 'ink';
 import { useInput } from 'ink';
 
+function short(params) {
+	if (!params) return '';
+
+	let ret = JSON.stringify(params, null, 2);
+	if (ret.length > 128) {
+		ret = ret.slice(0, 128) + '...\n';
+	}
+
+	return ret;
+}
+
 export default function ToolSelection({
 	toolCall,
 	onAccept,
@@ -9,6 +20,7 @@ export default function ToolSelection({
 	onDecline,
 }) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	const params = short(toolCall.args);
 
 	useInput((input, key) => {
 		if (key.upArrow) {
@@ -48,7 +60,7 @@ export default function ToolSelection({
 						<Text bold>Arguments:</Text>
 					</Text>
 					<Box>
-						<Text>{JSON.stringify(toolCall.args, null, 2)}</Text>
+						<Text>{params}</Text>
 					</Box>
 				</Box>
 

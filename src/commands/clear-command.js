@@ -1,6 +1,6 @@
 import { getSystemPrompt } from '../lib/prompt';
 
-export async function clearCommand({ setMessages }) {
+export async function clearCommand({ onAddMessage }) {
 	try {
 		const newMessages = [
 			{
@@ -8,7 +8,9 @@ export async function clearCommand({ setMessages }) {
 				content: getSystemPrompt({ custom: true }),
 			},
 		];
-		setMessages((prev) => newMessages);
+
+		// FIXME:
+		// setMessages((prev) => newMessages);
 		return { role: 'gui', content: 'cleared' };
 	} catch (err) {
 		console.log(err?.message);

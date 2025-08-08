@@ -85,7 +85,7 @@ export default function ChatApp({ config = {} }) {
 			</Box>
 
 			{/* Tool Selection */}
-			{isToolSelectionActive && pendingToolCall && (
+			{isToolSelectionActive && (
 				<ToolSelection
 					toolCall={pendingToolCall}
 					onAccept={handleToolAccept}

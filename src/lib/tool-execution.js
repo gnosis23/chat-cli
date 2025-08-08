@@ -1,12 +1,15 @@
 import { convertToolResultForUser, toolsExecute } from '../tools';
 
-export async function execute(pendingToolCall, { config, setMessages }) {
+export async function execute(pendingToolCall, { config, onAddMessage }) {
 	// Execute the tool call
 	const executeFn = toolsExecute[pendingToolCall.toolName];
 	if (!executeFn) {
 		throw new Error(`Tool ${pendingToolCall.toolName} not found`);
 	}
-	const result = await executeFn(pendingToolCall.args, { config, setMessages });
+	const result = await executeFn(pendingToolCall.args, {
+		config,
+		onAddMessage,
+	});
 	const resultUser = convertToolResultForUser({
 		toolName: pendingToolCall.toolName,
 		args: pendingToolCall.args,

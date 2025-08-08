@@ -54,8 +54,8 @@ function showHelp() {
 function createCustomFunc(fileContent, commandName) {
 	return async function ({
 		config,
-		messages,
-		setMessages,
+		messagesRef,
+		onAddMessage,
 		onChunk,
 		args,
 		onSelect,
@@ -71,15 +71,13 @@ function createCustomFunc(fileContent, commandName) {
 		// Add context about the command being executed
 		const fullPrompt = `${prompt}`;
 
-		const newMessages = [...messages, { role: 'user', content: fullPrompt }];
-
 		// update user input first
-		setMessages(newMessages);
+		onAddMessage({ role: 'user', content: fullPrompt });
 
 		await generateTextAuto({
 			config,
-			messages: newMessages,
-			onChangeMessage: setMessages,
+			messagesRef,
+			onAddMessage,
 			onChunk,
 			onSelect,
 		});

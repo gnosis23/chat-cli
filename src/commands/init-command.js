@@ -2,17 +2,15 @@ import { generateTextAuto } from '../lib/chat';
 
 export async function initCommand({
 	config,
-	messages,
-	setMessages,
+	messagesRef,
+	onAddMessage,
 	onChunk,
 	onSelect,
 }) {
 	try {
-		const newMessages = [
-			...messages,
-			{
-				role: 'user',
-				content: `
+		onAddMessage({
+			role: 'user',
+			content: `
             Create a chat-cli.md markdown file for this project that includes:
             - Project overview
             - Architecture
@@ -23,12 +21,12 @@ export async function initCommand({
 
             Ensure the format is clear.
         `,
-			},
-		];
+		});
+
 		await generateTextAuto({
 			config,
-			messages: newMessages,
-			onChangeMessage: setMessages,
+			messagesRef,
+			onAddMessage,
 			onChunk,
 			onSelect,
 		});
