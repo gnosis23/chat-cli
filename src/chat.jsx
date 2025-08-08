@@ -59,7 +59,11 @@ export default function ChatApp({ config = {} }) {
 			<Box marginBottom={1} minWidth={120}>
 				<Static items={messages}>
 					{(item, index) => (
-						<HistoryMessage key={index} message={item} index={index} />
+						<HistoryMessage
+							key={`${item.role}-${index}`}
+							message={item}
+							index={index}
+						/>
 					)}
 				</Static>
 				{streamingMessage && (

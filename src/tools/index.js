@@ -28,6 +28,7 @@ import {
 	writeTodoToolInfo,
 } from './write-todo-tool.js';
 import { lsExecute, lsTool, lsToolInfo } from './ls-tool.js';
+import { taskExecute, taskTool, taskToolInfo } from './task-tool.js';
 
 export const toolsObject = {
 	Fetch: fetchTool,
@@ -40,6 +41,7 @@ export const toolsObject = {
 	Glob: globTool,
 	WriteTodo: writeTodoTool,
 	LS: lsTool,
+	Task: taskTool,
 };
 
 export const toolsExecute = {
@@ -53,6 +55,7 @@ export const toolsExecute = {
 	Glob: globExecute,
 	WriteTodo: writeTodoExecute,
 	LS: lsExecute,
+	Task: taskExecute,
 };
 
 export const convertToolResultForUser = (toolResult) => {
@@ -87,6 +90,9 @@ export const convertToolResultForUser = (toolResult) => {
 			break;
 		case 'LS':
 			result = lsToolInfo(toolResult.args, toolResult.result);
+			break;
+		case 'Task':
+			result = taskToolInfo(toolResult.args, toolResult.result);
 			break;
 		default:
 			result = {

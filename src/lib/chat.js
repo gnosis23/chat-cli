@@ -1,6 +1,7 @@
 import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { toolsObject, convertToolResultForUser } from '../tools';
+import { execute } from './tool-execution';
 
 const convertToAISdkMessages = (messages) => {
 	const list = messages
@@ -33,11 +34,12 @@ const convertToAISdkMessages = (messages) => {
 export async function generateTextAuto({
 	config,
 	messages,
+	isTask = false,
 	onChangeMessage,
 	onChunk,
 	onSelect,
 }) {
-	const currentMessages = [...messages];
+	let currentMessages = [...messages];
 
 	const model =
 		config.model ||
@@ -55,6 +57,9 @@ export async function generateTextAuto({
 
 	// main loop
 	let maxStep = config.maxStep || 100;
+	const tools = { ...config.tools, ...toolsObject };
+	if (isTask) delete tools.Task;
+
 	while (maxStep) {
 		maxStep -= 1;
 
@@ -62,7 +67,7 @@ export async function generateTextAuto({
 			model: openai.chat(model),
 			messages: convertToAISdkMessages(currentMessages),
 			temperature: config.temperature || 0.7,
-			tools: { ...config.tools, ...toolsObject },
+			tools: tools,
 			onStepFinish({ text, toolCalls, toolResults }) {
 				if (text) {
 					currentMessages.push({ role: 'assistant', content: text });
@@ -147,9 +152,19 @@ export async function generateTextAuto({
 			Array.isArray(lastContent) &&
 			lastContent[0].type === 'tool-call'
 		) {
-			// wait for user select
-			await onSelect(lastContent[0], currentMessages);
-			break;
+			if (isTask) {
+				const result = await execute(lastContent[0], {
+					config,
+					messages: currentMessages,
+					setMessages: (msgs) => null,
+				});
+				currentMessages.push(result);
+				onChangeMessage?.([...currentMessages]);
+			} else {
+				// wait for user select
+				await onSelect(lastContent[0], currentMessages);
+				break;
+			}
 		}
 
 		if (process.env.DEBUG === '1') {

@@ -1,40 +1,9 @@
 import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
-import { convertToolResultForUser, toolsExecute } from '../tools/index.js';
 import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
-
-async function execute(pendingToolCall, messages, setMessages) {
-	// Execute the tool call
-	const executeFn = toolsExecute[pendingToolCall.toolName];
-	if (!executeFn) {
-		throw new Error(`Tool ${pendingToolCall.toolName} not found`);
-	}
-	const result = await executeFn(pendingToolCall.args, setMessages);
-	const resultUser = convertToolResultForUser({
-		toolName: pendingToolCall.toolName,
-		args: pendingToolCall.args,
-		result,
-	});
-
-	// Add tool result to messages
-	const toolResultMessage = {
-		role: 'tool',
-		content: [
-			{
-				type: 'tool-result',
-				toolCallId: pendingToolCall.toolCallId,
-				toolName: pendingToolCall.toolName,
-				result: result,
-				title: `${resultUser.title}`,
-				text: resultUser.text,
-			},
-		],
-	};
-
-	return toolResultMessage;
-}
+import { execute } from '../lib/tool-execution.js';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
@@ -124,7 +93,11 @@ export const useAIChat = (config = {}) => {
 		setIsToolSelectionActive(false);
 
 		try {
-			const message = await execute(_pendingToolCall, _messages, setMessages);
+			const message = await execute(_pendingToolCall, {
+				config,
+				messages: _messages,
+				setMessages,
+			});
 			const updatedMessages = [..._messages, message];
 			setMessages(updatedMessages);
 
@@ -145,7 +118,11 @@ export const useAIChat = (config = {}) => {
 		setAutoAcceptMode(true);
 
 		try {
-			const message = await execute(_pendingToolCall, messages, setMessages);
+			const message = await execute(_pendingToolCall, {
+				config,
+				messages: messages,
+				setMessages,
+			});
 			const updatedMessages = [...messages, message];
 			setMessages(updatedMessages);
 
