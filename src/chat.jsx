@@ -56,14 +56,16 @@ export default function ChatApp({ config = {} }) {
 	return (
 		<Box flexDirection="column" gap={0}>
 			{/* Message history */}
-			<Box flexDirection="column" marginBottom={1} minWidth={120}>
-				{messages.map((item, index) => (
-					<HistoryMessage
-						key={`${item.role}-${index}`}
-						message={item}
-						index={index}
-					/>
-				))}
+			<Box marginBottom={1} minWidth={120}>
+				<Static items={messages}>
+					{(item, index) => (
+						<HistoryMessage
+							key={`${item.role}-${index}`}
+							message={item}
+							index={index}
+						/>
+					)}
+				</Static>
 				{streamingMessage && (
 					<AIMessage
 						message={streamingMessage}
