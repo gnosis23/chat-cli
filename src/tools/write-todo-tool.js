@@ -33,13 +33,14 @@ export const writeTodoTool = tool({
 			})
 		),
 	}),
-	execute: async ({ todos }) => {
-		writeTodos(todos);
-		return {
-			newTodos: todos,
-		};
-	},
 });
+
+export const writeTodoExecute = async ({ todos }) => {
+	writeTodos(todos);
+	return {
+		newTodos: todos,
+	};
+};
 
 export const writeTodoToolInfo = ({ todos }, { newTodos }) => {
 	const completedCount = newTodos.filter(

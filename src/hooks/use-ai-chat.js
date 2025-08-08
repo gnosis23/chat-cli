@@ -5,13 +5,13 @@ import { getCommands } from '../commands';
 import { getSystemPrompt } from '../lib/prompt.js';
 import { generateTextAuto } from '../lib/chat.js';
 
-async function execute(pendingToolCall) {
+async function execute(pendingToolCall, messages, setMessages) {
 	// Execute the tool call
 	const executeFn = toolsExecute[pendingToolCall.toolName];
 	if (!executeFn) {
 		throw new Error(`Tool ${pendingToolCall.toolName} not found`);
 	}
-	const result = await executeFn(pendingToolCall.args);
+	const result = await executeFn(pendingToolCall.args, setMessages);
 	const resultUser = convertToolResultForUser({
 		toolName: pendingToolCall.toolName,
 		args: pendingToolCall.args,
@@ -36,11 +36,6 @@ async function execute(pendingToolCall) {
 	return toolResultMessage;
 }
 
-async function doExecute(pendingToolCall, messages) {
-	const toolResultMessage = await execute(pendingToolCall);
-	return [...messages, toolResultMessage];
-}
-
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
 	const [messages, setMessages] = useState(() => {
@@ -62,54 +57,57 @@ export const useAIChat = (config = {}) => {
 	const [isToolSelectionActive, setIsToolSelectionActive] = useState(false);
 	const [autoAcceptMode, setAutoAcceptMode] = useState(false);
 
-	const handleUserSelect = (tool) => {
-		setPendingToolCall(tool);
+	const handleUserSelect = (tool, messages) => {
+		const shouldSelect = [
+			'Bash',
+			'WriteFile',
+			'UpdateFile',
+			'Weather',
+		].includes(tool.toolName);
 
-		if (autoAcceptMode) {
+		if (autoAcceptMode || !shouldSelect) {
 			// Auto-accept the tool call when auto accept mode is enabled
-			handleToolAccept(tool);
+			handleToolAccept(tool, messages);
 		} else {
+			setPendingToolCall(tool);
 			setIsToolSelectionActive(true);
 		}
 	};
 
-	const sendMessage = useCallback(
-		async (messages) => {
-			if (isLoading) return;
+	const sendMessage = async (messages) => {
+		if (isLoading) return;
 
-			setIsLoading(true);
-			setError(null);
-			setStreamingMessage('');
+		setIsLoading(true);
+		setError(null);
+		setStreamingMessage('');
+		setStreamingTokenCount(0);
+
+		try {
+			await generateTextAuto({
+				config,
+				messages,
+				onChangeMessage: setMessages,
+				onChunk: (textPart, fullMessage, estimatedTokens) => {
+					setStreamingTokenCount(estimatedTokens);
+					setStreamingMessage(fullMessage); // Still store full message but won't display it
+				},
+				onSelect: handleUserSelect,
+			});
+		} catch (err) {
+			setError(err.message);
+			throw err;
+		} finally {
+			setIsLoading(false);
+			setStreamingMessage(null);
 			setStreamingTokenCount(0);
+			setIsComplete(true);
 
-			try {
-				await generateTextAuto({
-					config,
-					messages,
-					onChangeMessage: setMessages,
-					onChunk: (textPart, fullMessage, estimatedTokens) => {
-						setStreamingTokenCount(estimatedTokens);
-						setStreamingMessage(fullMessage); // Still store full message but won't display it
-					},
-					onSelect: handleUserSelect,
-				});
-			} catch (err) {
-				setError(err.message);
-				throw err;
-			} finally {
-				setIsLoading(false);
-				setStreamingMessage(null);
-				setStreamingTokenCount(0);
-				setIsComplete(true);
-
-				// Auto-exit in CLI mode after response is complete
-				if (config.cliMode) {
-					setTimeout(() => exit(), 100);
-				}
+			// Auto-exit in CLI mode after response is complete
+			if (config.cliMode) {
+				setTimeout(() => exit(), 100);
 			}
-		},
-		[config, isLoading, exit, autoAcceptMode]
-	);
+		}
+	};
 
 	const cancelMessage = useCallback(() => {
 		setIsLoading(false);
@@ -118,52 +116,49 @@ export const useAIChat = (config = {}) => {
 		setError('Message cancelled by user');
 	}, []);
 
-	const handleToolAccept = useCallback(
-		async (toolCall) => {
-			const _pendingToolCall = toolCall || pendingToolCall;
-			if (!_pendingToolCall) return;
+	const handleToolAccept = async (toolCall, currentMessages) => {
+		const _pendingToolCall = toolCall || pendingToolCall;
+		const _messages = currentMessages || messages;
+		if (!_pendingToolCall) return;
 
-			setIsToolSelectionActive(false);
+		setIsToolSelectionActive(false);
 
-			try {
-				const updatedMessages = await doExecute(_pendingToolCall, messages);
-				setMessages(updatedMessages);
+		try {
+			const message = await execute(_pendingToolCall, _messages, setMessages);
+			const updatedMessages = [..._messages, message];
+			setMessages(updatedMessages);
 
-				// Continue the conversation
-				await sendMessage(updatedMessages);
-			} catch (err) {
-				setError(`Tool execution failed: ${err.message}`);
-			} finally {
-				setPendingToolCall(null);
-			}
-		},
-		[pendingToolCall, messages, sendMessage]
-	);
+			// Continue the conversation
+			await sendMessage(updatedMessages);
+		} catch (err) {
+			setError(`Tool execution failed: ${err.message}`);
+		} finally {
+			setPendingToolCall(null);
+		}
+	};
 
-	const handleToolAcceptAuto = useCallback(
-		async (toolCall) => {
-			const _pendingToolCall = toolCall || pendingToolCall;
-			if (!_pendingToolCall) return;
+	const handleToolAcceptAuto = async (toolCall) => {
+		const _pendingToolCall = toolCall || pendingToolCall;
+		if (!_pendingToolCall) return;
 
-			setIsToolSelectionActive(false);
-			setAutoAcceptMode(true);
+		setIsToolSelectionActive(false);
+		setAutoAcceptMode(true);
 
-			try {
-				const updatedMessages = await doExecute(_pendingToolCall, messages);
-				setMessages(updatedMessages);
+		try {
+			const message = await execute(_pendingToolCall, messages, setMessages);
+			const updatedMessages = [...messages, message];
+			setMessages(updatedMessages);
 
-				// Continue the conversation
-				await sendMessage(updatedMessages);
-			} catch (err) {
-				setError(`Tool execution failed: ${err.message}`);
-			} finally {
-				setPendingToolCall(null);
-			}
-		},
-		[pendingToolCall, messages, sendMessage]
-	);
+			// Continue the conversation
+			await sendMessage(updatedMessages);
+		} catch (err) {
+			setError(`Tool execution failed: ${err.message}`);
+		} finally {
+			setPendingToolCall(null);
+		}
+	};
 
-	const handleToolDecline = useCallback(() => {
+	const handleToolDecline = () => {
 		if (!pendingToolCall) return;
 
 		setIsToolSelectionActive(false);
@@ -179,7 +174,7 @@ export const useAIChat = (config = {}) => {
 		setMessages(updatedMessages);
 
 		setPendingToolCall(null);
-	}, [pendingToolCall, messages, sendMessage]);
+	};
 
 	const handleSubmit = async (inputText) => {
 		if (inputText.trim()) {

@@ -13,19 +13,20 @@ export const lsTool = tool({
 			.optional()
 			.default(process.cwd()),
 	}),
-	execute: async ({ path }) => {
-		try {
-			const pattern = path + (path.endsWith('/') ? '' : '/') + '**';
-			const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
-			const files = await glob(pattern, {
-				ignore: ignorePatterns,
-			});
-			return { files };
-		} catch (error) {
-			return { files: [], error: `Failed to ls: ${error.message}` };
-		}
-	},
 });
+
+export const lsExecute = async ({ path }) => {
+	try {
+		const pattern = path + (path.endsWith('/') ? '' : '/') + '**';
+		const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
+		const files = await glob(pattern, {
+			ignore: ignorePatterns,
+		});
+		return { files };
+	} catch (error) {
+		return { files: [], error: `Failed to ls: ${error.message}` };
+	}
+};
 
 export const lsToolInfo = ({ path }, { files, error }) => {
 	return {

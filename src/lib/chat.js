@@ -147,15 +147,9 @@ export async function generateTextAuto({
 			Array.isArray(lastContent) &&
 			lastContent[0].type === 'tool-call'
 		) {
-			if (
-				['Weather', 'Bash', 'WriteFile', 'UpdateFile'].includes(
-					lastContent[0].toolName
-				)
-			) {
-				// wait for user select
-				onSelect(lastContent[0]);
-				break;
-			}
+			// wait for user select
+			await onSelect(lastContent[0], currentMessages);
+			break;
 		}
 
 		if (process.env.DEBUG === '1') {

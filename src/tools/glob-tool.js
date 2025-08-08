@@ -13,18 +13,19 @@ export const globTool = tool({
 			.string()
 			.describe('The glob pattern to match files like "/*.js" or "src/*.ts"'),
 	}),
-	execute: async ({ pattern }) => {
-		try {
-			const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
-			const files = await glob(pattern, {
-				ignore: ignorePatterns,
-			});
-			return { files };
-		} catch (error) {
-			return { files: [], error: `Failed to glob files: ${error.message}` };
-		}
-	},
 });
+
+export const globExecute = async ({ pattern }) => {
+	try {
+		const ignorePatterns = getIgnorePatterns(['node_modules/**', '.git/**']);
+		const files = await glob(pattern, {
+			ignore: ignorePatterns,
+		});
+		return { files };
+	} catch (error) {
+		return { files: [], error: `Failed to glob files: ${error.message}` };
+	}
+};
 
 export const globToolInfo = ({ pattern }, { files, error }) => {
 	return {

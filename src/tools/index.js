@@ -1,11 +1,15 @@
-import { fetchTool, fetchToolInfo } from './fetch-tool.js';
+import { fetchExecute, fetchTool, fetchToolInfo } from './fetch-tool.js';
 import {
 	weatherExecute,
 	weatherTool,
 	weatherToolInfo,
 } from './weather-tool.js';
 import { bashExecute, bashTool, bashToolInfo } from './bash-tool.js';
-import { readFileTool, readFileToolInfo } from './read-file-tool.js';
+import {
+	readFileExecute,
+	readFileTool,
+	readFileToolInfo,
+} from './read-file-tool.js';
 import {
 	writeFileExecute,
 	writeFileTool,
@@ -16,10 +20,14 @@ import {
 	updateFileTool,
 	updateFileToolInfo,
 } from './update-file-tool.js';
-import { grepTool, grepToolInfo } from './grep-tool.js';
-import { globTool, globToolInfo } from './glob-tool.js';
-import { writeTodoTool, writeTodoToolInfo } from './write-todo-tool.js';
-import { lsTool, lsToolInfo } from './ls-tool.js';
+import { grepExecute, grepTool, grepToolInfo } from './grep-tool.js';
+import { globExecute, globTool, globToolInfo } from './glob-tool.js';
+import {
+	writeTodoExecute,
+	writeTodoTool,
+	writeTodoToolInfo,
+} from './write-todo-tool.js';
+import { lsExecute, lsTool, lsToolInfo } from './ls-tool.js';
 
 export const toolsObject = {
 	Fetch: fetchTool,
@@ -35,10 +43,16 @@ export const toolsObject = {
 };
 
 export const toolsExecute = {
+	Fetch: fetchExecute,
 	Weather: weatherExecute,
 	Bash: bashExecute,
+	ReadFile: readFileExecute,
 	WriteFile: writeFileExecute,
 	UpdateFile: updateFileExecute,
+	Grep: grepExecute,
+	Glob: globExecute,
+	WriteTodo: writeTodoExecute,
+	LS: lsExecute,
 };
 
 export const convertToolResultForUser = (toolResult) => {

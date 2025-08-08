@@ -18,38 +18,39 @@ export const readFileTool = {
 			.optional()
 			.describe('The maximum number of lines to read'),
 	}),
-	execute: async ({ filePath, offset, limit }) => {
-		try {
-			const content = await fs.readFile(filePath, 'utf-8');
-			const lines = content.split('\n');
+};
 
-			let startIndex = 0;
-			let endIndex = lines.length;
+export const readFileExecute = async ({ filePath, offset, limit }) => {
+	try {
+		const content = await fs.readFile(filePath, 'utf-8');
+		const lines = content.split('\n');
 
-			if (offset && offset > 0) {
-				startIndex = offset - 1;
-			}
+		let startIndex = 0;
+		let endIndex = lines.length;
 
-			if (limit && limit > 0) {
-				endIndex = Math.min(startIndex + limit, lines.length);
-			}
-
-			const selectedLines = lines.slice(startIndex, endIndex);
-			const result = selectedLines.join('\n');
-
-			return {
-				success: true,
-				text: result,
-				lineCount: result.split('\n').length,
-				totalLines: lines.length,
-			};
-		} catch (error) {
-			return {
-				success: false,
-				text: `Failed to read file: ${error.message}`,
-			};
+		if (offset && offset > 0) {
+			startIndex = offset - 1;
 		}
-	},
+
+		if (limit && limit > 0) {
+			endIndex = Math.min(startIndex + limit, lines.length);
+		}
+
+		const selectedLines = lines.slice(startIndex, endIndex);
+		const result = selectedLines.join('\n');
+
+		return {
+			success: true,
+			text: result,
+			lineCount: result.split('\n').length,
+			totalLines: lines.length,
+		};
+	} catch (error) {
+		return {
+			success: false,
+			text: `Failed to read file: ${error.message}`,
+		};
+	}
 };
 
 export const readFileToolInfo = (

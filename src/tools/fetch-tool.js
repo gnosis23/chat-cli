@@ -54,15 +54,16 @@ export const fetchTool = tool({
 	parameters: z.object({
 		url: z.string().url().describe('The URL to fetch content from'),
 	}),
-	execute: async ({ url }) => {
-		const result = await fetchUrl(url);
-		return {
-			url: result.url,
-			size: result.size,
-			content: result.content,
-		};
-	},
 });
+
+export const fetchExecute = async ({ url }) => {
+	const result = await fetchUrl(url);
+	return {
+		url: result.url,
+		size: result.size,
+		content: result.content,
+	};
+};
 
 export const fetchToolInfo = ({ url }, { size }) => {
 	return {

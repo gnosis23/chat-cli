@@ -42,32 +42,33 @@ export const grepTool = tool({
 	parameters: z.object({
 		pattern: z.string().describe(''),
 	}),
-	execute: async ({ pattern }) => {
-		try {
-			// Get gitignore patterns and extract directory patterns
-			const gitignorePatterns = getGitignorePatterns();
-			const ignoreDirs = gitignorePatterns
-				.filter((pattern) => pattern.includes('/') || pattern.endsWith('/**'))
-				.map((pattern) => pattern.replace('/**', '').replace('**/', ''))
-				.filter(
-					(pattern) =>
-						pattern && !pattern.includes('*') && !pattern.startsWith('!')
-				);
-
-			const results = await bashGrep(pattern, ignoreDirs);
-			return {
-				pattern: pattern,
-				list: results,
-			};
-		} catch (err) {
-			return {
-				pattern: pattern,
-				list: [],
-				error: `Error executing grep: ${err.message}`,
-			};
-		}
-	},
 });
+
+export const grepExecute = async ({ pattern }) => {
+	try {
+		// Get gitignore patterns and extract directory patterns
+		const gitignorePatterns = getGitignorePatterns();
+		const ignoreDirs = gitignorePatterns
+			.filter((pattern) => pattern.includes('/') || pattern.endsWith('/**'))
+			.map((pattern) => pattern.replace('/**', '').replace('**/', ''))
+			.filter(
+				(pattern) =>
+					pattern && !pattern.includes('*') && !pattern.startsWith('!')
+			);
+
+		const results = await bashGrep(pattern, ignoreDirs);
+		return {
+			pattern: pattern,
+			list: results,
+		};
+	} catch (err) {
+		return {
+			pattern: pattern,
+			list: [],
+			error: `Error executing grep: ${err.message}`,
+		};
+	}
+};
 
 export const grepToolInfo = ({ pattern }, { list }) => {
 	return {
