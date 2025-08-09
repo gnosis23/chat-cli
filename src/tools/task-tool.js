@@ -44,7 +44,7 @@ export const taskExecute = async ({ prompt }, { config, onAddMessage }) => {
 			],
 		};
 
-		const resultMessages = await generateTextAuto({
+		await generateTextAuto({
 			isTask: true,
 			config,
 			messagesRef,
@@ -76,7 +76,7 @@ export const taskExecute = async ({ prompt }, { config, onAddMessage }) => {
 		// 	'----------------'
 		// );
 
-		return { text: lastAssistantContent(resultMessages) };
+		return { text: lastAssistantContent(messagesRef.current) };
 	} catch (error) {
 		// console.log('error', error);
 		return { error: `Failed to run task: ${error.message}` };

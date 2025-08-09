@@ -191,6 +191,4 @@ export async function generateTextAuto({
 			content: [{ type: 'maxStep', text: 'reach max step, continue?' }],
 		});
 	}
-
-	return messagesRef.current;
 }
