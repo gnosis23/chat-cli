@@ -6,6 +6,7 @@ export async function initCommand({
 	onAddMessage,
 	onChunk,
 	onSelect,
+	onUsage,
 }) {
 	try {
 		onAddMessage({
@@ -29,6 +30,7 @@ export async function initCommand({
 			onAddMessage,
 			onChunk,
 			onSelect,
+			onUsage,
 		});
 	} catch (err) {
 		console.log(err?.message);
