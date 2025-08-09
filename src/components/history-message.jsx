@@ -12,6 +12,7 @@ const colors = {
 	tool: '#0098df',
 	error: 'red',
 	secondary: '#ccc',
+	childTool: '#df920c',
 };
 
 const prefixes = {
@@ -23,7 +24,7 @@ const prefixes = {
 	info: '$',
 };
 
-export const HistoryMessage = ({ message, index }) => {
+export const HistoryMessage = ({ message }) => {
 	if (message.role === 'system') {
 		return null;
 	}
@@ -40,14 +41,24 @@ export const HistoryMessage = ({ message, index }) => {
 							paddingLeft={GAP_SIZE}
 						>
 							<Box gap={1}>
-								<Text color={colors.secondary} bold>
-									{msg.type}:
-								</Text>
 								{msg.type === 'usage' ? (
 									<Text color={colors.secondary}>
 										promptTokens-{msg.usage?.promptTokens} completionTokens-
 										{msg.usage?.completionTokens}
 									</Text>
+								) : msg.type === 'task' ? (
+									<Box>
+										<Text color={colors.tool}>Task</Text>
+										<Text color={colors.secondary}>({msg.title})</Text>
+									</Box>
+								) : msg.type === 'child:tool' ? (
+									<Box flexDirection="column" paddingLeft={4}>
+										<Box>
+											<Text color={colors.childTool}>{msg.toolName}</Text>
+											<Text color={colors.secondary}>({msg.title})</Text>
+										</Box>
+										<Text dimColor>{msg.text}</Text>
+									</Box>
 								) : (
 									<Text color={colors.secondary}>{msg.text}</Text>
 								)}

@@ -5,7 +5,7 @@ import { getSystemPrompt } from '../lib/prompt.js';
 import { lastAssistantContent } from '../lib/message-util.js';
 
 const taskDescription = `
-Launch a new agent that has access to the following tools: Bash, Glob, Grep, LS, ReadFile, UpdateFile, WriteFile, Fetch, TodoWrite. 
+Launch a new agent that has access to the following tools: Bash, Glob, Grep, LS, ReadFile, UpdateFile, WriteFile, Fetch, TodoWrite.
 When you are searching for a keyword or file and are not confident that you will find the right match in the first few tries, use the Agent tool to perform the search for you.
 
 When to use the Agent tool:
@@ -34,7 +34,7 @@ export const taskExecute = async ({ prompt }, { config, onAddMessage }) => {
 	try {
 		onAddMessage({
 			role: 'gui',
-			content: [{ type: 'info', text: `task(${prompt}) created` }],
+			content: [{ type: 'task', title: prompt, text: `start` }],
 		});
 
 		const messagesRef = {
@@ -49,12 +49,22 @@ export const taskExecute = async ({ prompt }, { config, onAddMessage }) => {
 			config,
 			messagesRef,
 			onAddMessage: (x) => {
-				// if (process.env.DEBUG === '1') {
-				// 	console.log('---- onChangeMessage ----');
-				// 	console.log(JSON.stringify(lastAssistantContent(x), null, 2));
-				// 	console.log('\n');
-				// }
 				messagesRef.current.push(x);
+				if (x.role === 'tool') {
+					x.content.forEach((content) => {
+						onAddMessage({
+							role: 'gui',
+							content: [
+								{
+									type: 'child:tool',
+									toolName: content.toolName,
+									title: content.title,
+									text: content.text,
+								},
+							],
+						});
+					});
+				}
 			},
 			onChunk: null,
 			onSelect: () => null,
