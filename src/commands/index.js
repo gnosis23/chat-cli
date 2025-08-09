@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import chalk from 'chalk';
-import { generateTextAuto } from '../lib/chat.js';
 import { configCommand } from './config-command.js';
 import { toolsCommand } from './tools-command.js';
 import { showMcpCommand } from './mcp-command.js';
@@ -52,15 +51,7 @@ function showHelp() {
 }
 
 function createCustomFunc(fileContent, commandName) {
-	return async function ({
-		config,
-		messagesRef,
-		onAddMessage,
-		onChunk,
-		args,
-		onSelect,
-		onUsage,
-	}) {
+	return async function ({ args }) {
 		if (typeof fileContent !== 'string') return;
 
 		// Replace template variables
@@ -72,21 +63,7 @@ function createCustomFunc(fileContent, commandName) {
 		// Add context about the command being executed
 		const fullPrompt = `${prompt}`;
 
-		// update user input first
-		onAddMessage({ role: 'user', content: fullPrompt });
-
-		await generateTextAuto({
-			config,
-			messagesRef,
-			onAddMessage,
-			onChunk,
-			onSelect,
-			onUsage,
-		});
-
-		// For external commands, we'll use the AI to process the prompt
-		// This can be extended to support more complex external command behaviors
-		return null;
+		return { role: 'user', content: fullPrompt };
 	};
 }
 

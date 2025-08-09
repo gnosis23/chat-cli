@@ -100,8 +100,6 @@ export const useAIChat = (config = {}) => {
 	};
 
 	const sendMessage = async () => {
-		if (isLoading) return;
-
 		enterLoading();
 		setError(null);
 		setStreamingMessage('');
@@ -144,39 +142,18 @@ export const useAIChat = (config = {}) => {
 	const handleSubmit = async (inputText) => {
 		if (inputText.trim()) {
 			const words = inputText.trim().split(/\s+/);
+			setCurrentInput('');
+
 			if (words[0] && commands[words[0]]) {
 				const func = commands[words[0]].func;
 				const args = words.slice(1).join(' ');
-				setCurrentInput('');
-				enterLoading();
-				try {
-					const commandResult = await func({
-						config,
-						messagesRef,
-						onAddMessage,
-						onChunk: (textPart, fullMessage, estimatedTokens) => {
-							setStreamingTokenCount(estimatedTokens);
-							setStreamingMessage(fullMessage); // Still store full message but won't display it
-						},
-						args,
-						onSelect: handleUserSelect,
-						onUsage: handleUsage,
-					});
-
-					if (commandResult) onAddMessage(commandResult);
-				} catch (err) {
-					console.error(err);
-				} finally {
-					setStreamingMessage(null);
-					setStreamingTokenCount(0);
-					leaveLoading();
-				}
-				return;
+				// built-in or custom commands
+				const commandResult = await func({ args });
+				if (commandResult) onAddMessage(commandResult);
+			} else {
+				const userMessage = { role: 'user', content: inputText.trim() };
+				onAddMessage(userMessage);
 			}
-
-			const userMessage = { role: 'user', content: inputText.trim() };
-			onAddMessage(userMessage);
-			setCurrentInput('');
 
 			await sendMessage();
 		}
@@ -200,7 +177,6 @@ export const useAIChat = (config = {}) => {
 			} else {
 				exit();
 			}
-			return;
 		}
 	});
 
