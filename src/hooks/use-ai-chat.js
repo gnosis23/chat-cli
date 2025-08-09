@@ -4,21 +4,22 @@ import { getCommands } from '../commands';
 import { generateTextAuto } from '../lib/chat.js';
 import { execute } from '../lib/tool-execution.js';
 import { useMessage } from './use-message.js';
+import { useLoading } from './use-loading.js';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
 	const { messages, onAddMessage, messagesRef } = useMessage();
+	const { isLoading, enterLoading, leaveLoading } = useLoading(false);
 	const [currentInput, setCurrentInput] = useState('');
 	const [streamingMessage, setStreamingMessage] = useState(null);
 	const [streamingTokenCount, setStreamingTokenCount] = useState(0);
-	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [isComplete, setIsComplete] = useState(false);
 	const [commands] = useState(() => getCommands());
 	const [pendingToolCall, setPendingToolCall] = useState(null);
 	const [autoAcceptMode, setAutoAcceptMode] = useState(false);
 
-	const handleUserSelect = (tool) => {
+	const handleUserSelect = async (tool) => {
 		const shouldSelect = [
 			'Bash',
 			'WriteFile',
@@ -28,59 +29,18 @@ export const useAIChat = (config = {}) => {
 
 		if (autoAcceptMode || !shouldSelect) {
 			// Auto-accept the tool call when auto accept mode is enabled
-			handleToolAccept(tool);
+			await handleToolAccept(tool);
 		} else {
 			setPendingToolCall(tool);
 		}
 	};
-
-	const sendMessage = async () => {
-		if (isLoading) return;
-
-		setIsLoading(true);
-		setError(null);
-		setStreamingMessage('');
-		setStreamingTokenCount(0);
-
-		try {
-			await generateTextAuto({
-				config,
-				messagesRef,
-				onAddMessage,
-				onChunk: (textPart, fullMessage, estimatedTokens) => {
-					setStreamingTokenCount(estimatedTokens);
-					setStreamingMessage(fullMessage); // Still store full message but won't display it
-				},
-				onSelect: handleUserSelect,
-			});
-		} catch (err) {
-			setError(err.message);
-			throw err;
-		} finally {
-			setIsLoading(false);
-			setStreamingMessage(null);
-			setStreamingTokenCount(0);
-			setIsComplete(true);
-
-			// Auto-exit in CLI mode after response is complete
-			if (config.cliMode) {
-				setTimeout(() => exit(), 100);
-			}
-		}
-	};
-
-	const cancelMessage = useCallback(() => {
-		setIsLoading(false);
-		setStreamingMessage(null);
-		setStreamingTokenCount(0);
-		setError('Message cancelled by user');
-	}, []);
 
 	const handleToolAccept = async (toolCall) => {
 		const _pendingToolCall = toolCall || pendingToolCall;
 		if (!_pendingToolCall) return;
 
 		setPendingToolCall(null);
+		enterLoading();
 
 		try {
 			const message = await execute(_pendingToolCall, {
@@ -93,6 +53,8 @@ export const useAIChat = (config = {}) => {
 			await sendMessage();
 		} catch (err) {
 			setError(`Tool execution failed: ${err.message}`);
+		} finally {
+			leaveLoading();
 		}
 	};
 
@@ -132,6 +94,47 @@ export const useAIChat = (config = {}) => {
 		setPendingToolCall(null);
 	};
 
+	const sendMessage = async () => {
+		if (isLoading) return;
+
+		enterLoading();
+		setError(null);
+		setStreamingMessage('');
+		setStreamingTokenCount(0);
+
+		try {
+			await generateTextAuto({
+				config,
+				messagesRef,
+				onAddMessage,
+				onChunk: (textPart, fullMessage, estimatedTokens) => {
+					setStreamingTokenCount(estimatedTokens);
+					setStreamingMessage(fullMessage); // Still store full message but won't display it
+				},
+				onSelect: handleUserSelect,
+			});
+		} catch (err) {
+			setError(err.message);
+			throw err;
+		} finally {
+			leaveLoading();
+			setStreamingMessage(null);
+			setStreamingTokenCount(0);
+			setIsComplete(true);
+
+			// Auto-exit in CLI mode after response is complete
+			if (config.cliMode) {
+				setTimeout(() => exit(), 100);
+			}
+		}
+	};
+
+	const cancelMessage = useCallback(() => {
+		setStreamingMessage(null);
+		setStreamingTokenCount(0);
+		setError('Message cancelled by user');
+	}, []);
+
 	const handleSubmit = async (inputText) => {
 		if (inputText.trim()) {
 			const words = inputText.trim().split(/\s+/);
@@ -139,7 +142,7 @@ export const useAIChat = (config = {}) => {
 				const func = commands[words[0]].func;
 				const args = words.slice(1).join(' ');
 				setCurrentInput('');
-				setIsLoading(true);
+				enterLoading();
 				try {
 					const commandResult = await func({
 						config,
@@ -159,7 +162,7 @@ export const useAIChat = (config = {}) => {
 				} finally {
 					setStreamingMessage(null);
 					setStreamingTokenCount(0);
-					setIsLoading(false);
+					leaveLoading();
 				}
 				return;
 			}
@@ -168,7 +171,7 @@ export const useAIChat = (config = {}) => {
 			onAddMessage(userMessage);
 			setCurrentInput('');
 
-			sendMessage();
+			await sendMessage();
 		}
 	};
 
