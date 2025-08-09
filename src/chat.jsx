@@ -25,6 +25,7 @@ export default function ChatApp({ config = {} }) {
 		handleToolAcceptAuto,
 		handleToolDecline,
 		autoAcceptMode,
+		context,
 	} = useAIChat(config);
 
 	// CLI mode: auto-submit initial prompt
@@ -103,6 +104,7 @@ export default function ChatApp({ config = {} }) {
 					prefix="> "
 					isLoading={isLoading}
 					autoAcceptMode={autoAcceptMode}
+					context={context}
 				/>
 			)}
 		</Box>

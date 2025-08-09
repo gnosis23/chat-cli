@@ -39,6 +39,7 @@ export async function generateTextAuto({
 	onAddMessage,
 	onChunk,
 	onSelect,
+	onUsage,
 }) {
 	const model =
 		config.model ||
@@ -140,6 +141,7 @@ export async function generateTextAuto({
 
 		const finishReason = await streamResult.finishReason;
 		const usage = await streamResult.usage;
+		if (onUsage) onUsage(usage);
 
 		const lastMessage = lastAssistantMessage(messagesRef.current);
 		const { role: lastType, content: lastContent } = lastMessage;

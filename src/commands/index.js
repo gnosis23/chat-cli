@@ -59,6 +59,7 @@ function createCustomFunc(fileContent, commandName) {
 		onChunk,
 		args,
 		onSelect,
+		onUsage,
 	}) {
 		if (typeof fileContent !== 'string') return;
 
@@ -80,6 +81,7 @@ function createCustomFunc(fileContent, commandName) {
 			onAddMessage,
 			onChunk,
 			onSelect,
+			onUsage,
 		});
 
 		// For external commands, we'll use the AI to process the prompt

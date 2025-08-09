@@ -26,6 +26,7 @@ export default function TextInput({
 	prefix = '> ',
 	isLoading,
 	autoAcceptMode = false,
+	context,
 }) {
 	const [cursorPosition, setCursorPosition] = useState(0);
 	const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
@@ -259,9 +260,17 @@ export default function TextInput({
 							? 'Press Ctrl+C to cancel'
 							: `Press Enter to send | Press Ctrl+C to exit | "/" to list commands`}
 					</Text>
-					<Text color="white" dimColor>
-						{autoAcceptMode ? 'Auto Mode' : 'Manual Mode'} (shift + Tab)
-					</Text>
+					<Box gap={1}>
+						{context > 0 && (
+							<>
+								<Text dimColor>context:{Math.floor(context / 1024)}K</Text>
+								<Text>|</Text>
+							</>
+						)}
+						<Text color="white" dimColor>
+							{autoAcceptMode ? 'Auto Mode' : 'Manual Mode'} (shift + Tab)
+						</Text>
+					</Box>
 				</Box>
 			)}
 		</>

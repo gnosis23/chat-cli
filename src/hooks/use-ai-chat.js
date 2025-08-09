@@ -18,6 +18,7 @@ export const useAIChat = (config = {}) => {
 	const [commands] = useState(() => getCommands());
 	const [pendingToolCall, setPendingToolCall] = useState(null);
 	const [autoAcceptMode, setAutoAcceptMode] = useState(false);
+	const [context, setContext] = useState(0);
 
 	const handleUserSelect = async (tool) => {
 		const shouldSelect = [
@@ -33,6 +34,10 @@ export const useAIChat = (config = {}) => {
 		} else {
 			setPendingToolCall(tool);
 		}
+	};
+
+	const handleUsage = (_usage) => {
+		setContext(_usage.totalTokens || 0);
 	};
 
 	const handleToolAccept = async (toolCall) => {
@@ -112,6 +117,7 @@ export const useAIChat = (config = {}) => {
 					setStreamingMessage(fullMessage); // Still store full message but won't display it
 				},
 				onSelect: handleUserSelect,
+				onUsage: handleUsage,
 			});
 		} catch (err) {
 			setError(err.message);
@@ -154,6 +160,7 @@ export const useAIChat = (config = {}) => {
 						},
 						args,
 						onSelect: handleUserSelect,
+						onUsage: handleUsage,
 					});
 
 					if (commandResult) onAddMessage(commandResult);
@@ -216,5 +223,6 @@ export const useAIChat = (config = {}) => {
 		handleToolDecline,
 		autoAcceptMode,
 		setAutoAcceptMode,
+		context,
 	};
 };
