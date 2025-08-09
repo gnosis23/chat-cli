@@ -1,6 +1,6 @@
 import { convertToolResultForUser, toolsExecute } from '../tools';
 
-export async function execute(pendingToolCall, { config, onAddMessage }) {
+export async function executeTool(pendingToolCall, { config, onAddMessage }) {
 	// Execute the tool call
 	const executeFn = toolsExecute[pendingToolCall.toolName];
 	if (!executeFn) {
@@ -16,8 +16,7 @@ export async function execute(pendingToolCall, { config, onAddMessage }) {
 		result,
 	});
 
-	// Add tool result to messages
-	const toolResultMessage = {
+	return {
 		role: 'tool',
 		content: [
 			{
@@ -30,6 +29,4 @@ export async function execute(pendingToolCall, { config, onAddMessage }) {
 			},
 		],
 	};
-
-	return toolResultMessage;
 }

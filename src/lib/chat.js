@@ -1,12 +1,12 @@
 import { streamText, APICallError, InvalidToolArgumentsError } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { toolsObject, convertToolResultForUser } from '../tools';
-import { execute } from './tool-execution';
+import { executeTool } from './tool-execution';
 import { lastAssistantMessage } from './message-util';
 
 const convertToAISdkMessages = (messages) => {
 	const list = messages
-		.filter((x) => x.role != 'gui')
+		.filter((x) => x.role !== 'gui')
 		.map((message) => {
 			if (message.role === 'tool') {
 				// remove title in content
@@ -151,9 +151,9 @@ export async function generateTextAuto({
 			lastContent[0].type === 'tool-call'
 		) {
 			if (isTask) {
-				const result = await execute(lastContent[0], {
+				const result = await executeTool(lastContent[0], {
 					config,
-					onAddMessage: (msgs) => null,
+					onAddMessage: () => null,
 				});
 				onAddMessage(result);
 			} else {

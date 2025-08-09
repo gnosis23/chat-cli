@@ -2,7 +2,7 @@ import { useInput, useApp } from 'ink';
 import { useState, useCallback } from 'react';
 import { getCommands } from '../commands';
 import { generateTextAuto } from '../lib/chat.js';
-import { execute } from '../lib/tool-execution.js';
+import { executeTool } from '../lib/tool-execution.js';
 import { useMessage } from './use-message.js';
 import { useLoading } from './use-loading.js';
 
@@ -48,7 +48,7 @@ export const useAIChat = (config = {}) => {
 		enterLoading();
 
 		try {
-			const message = await execute(_pendingToolCall, {
+			const message = await executeTool(_pendingToolCall, {
 				config,
 				onAddMessage,
 			});
@@ -71,7 +71,7 @@ export const useAIChat = (config = {}) => {
 		setAutoAcceptMode(true);
 
 		try {
-			const message = await execute(_pendingToolCall, {
+			const message = await executeTool(_pendingToolCall, {
 				config,
 				onAddMessage,
 			});
