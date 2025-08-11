@@ -105,6 +105,7 @@ export default function ChatApp({ config = {} }) {
 					isLoading={isLoading}
 					autoAcceptMode={autoAcceptMode}
 					context={context}
+					config={config}
 				/>
 			)}
 		</Box>

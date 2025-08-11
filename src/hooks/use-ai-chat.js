@@ -5,6 +5,7 @@ import { generateTextAuto } from '../lib/chat.js';
 import { executeTool } from '../lib/tool-execution.js';
 import { useMessage } from './use-message.js';
 import { useLoading } from './use-loading.js';
+import { addHistory } from '../lib/config.js';
 
 export const useAIChat = (config = {}) => {
 	const { exit } = useApp();
@@ -143,6 +144,10 @@ export const useAIChat = (config = {}) => {
 		if (inputText.trim()) {
 			const words = inputText.trim().split(/\s+/);
 			setCurrentInput('');
+
+			// Save to history
+			config.history = [...config.history, inputText.trim()];
+			await addHistory(inputText.trim());
 
 			if (words[0] && commands[words[0]]) {
 				const func = commands[words[0]].func;

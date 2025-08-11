@@ -22,6 +22,7 @@ const configSchema = z.object({
 		)
 		.optional()
 		.default({}),
+	history: z.array(z.string()).default([]),
 });
 
 export async function loadConfig() {
@@ -71,4 +72,16 @@ export function printConfig(config) {
 		console.log('- API Key: Not provided');
 	}
 	console.log('--------------------------------------\n');
+}
+
+export async function addHistory(text) {
+	try {
+		const configPath = `${process.env.HOME}/.chat-cli.json`;
+		const configFile = await fs.readFile(configPath, 'utf-8');
+		const settings = JSON.parse(configFile);
+		settings.history = [...(settings?.history ?? []), text];
+		await fs.writeFile(configPath, JSON.stringify(settings, null, 2));
+	} catch (err) {
+		console.error(err.message);
+	}
 }

@@ -6,4 +6,5 @@ export const defaultConfig = {
 	temperature: 0.7,
 	maxStep: 100,
 	mcpServers: {},
+	history: [],
 };

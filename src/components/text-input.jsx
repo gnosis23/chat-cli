@@ -27,11 +27,14 @@ export default function TextInput({
 	isLoading,
 	autoAcceptMode = false,
 	context,
+	config = {},
 }) {
 	const [cursorPosition, setCursorPosition] = useState(0);
 	const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
 	const [showCommands, setShowCommands] = useState(false);
 	const [commands] = useState(() => getCommands());
+	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [tempInput, setTempInput] = useState('');
 
 	const commandList = Object.keys(commands);
 	const filteredCommands = value.startsWith('/')
@@ -77,6 +80,52 @@ export default function TextInput({
 				return true; // Prevent default handling
 			}
 		}
+
+		// Handle history navigation
+		if (
+			(key.upArrow || key.downArrow) &&
+			!(showCommands && filteredCommands.length > 0)
+		) {
+			const history = config.history || [];
+			if (history.length === 0) return false;
+
+			if (key.upArrow) {
+				if (historyIndex === -1) {
+					// First time pressing up - save current input
+					setTempInput(value);
+					setHistoryIndex(history.length - 1);
+					onChange(history[history.length - 1]);
+				} else if (historyIndex > 0) {
+					// Move up in history
+					setHistoryIndex(historyIndex - 1);
+					onChange(history[historyIndex - 1]);
+				}
+				setCursorPosition(
+					history[historyIndex === -1 ? history.length - 1 : historyIndex - 1]
+						?.length || 0
+				);
+				return true;
+			}
+
+			if (key.downArrow) {
+				if (historyIndex === -1) return false; // Already at bottom
+
+				if (historyIndex < history.length - 1) {
+					// Move down in history
+					setHistoryIndex(historyIndex + 1);
+					onChange(history[historyIndex + 1]);
+					setCursorPosition(history[historyIndex + 1]?.length || 0);
+				} else {
+					// Back to temp input or empty
+					setHistoryIndex(-1);
+					onChange(tempInput);
+					setCursorPosition(tempInput.length);
+					setTempInput('');
+				}
+				return true;
+			}
+		}
+
 		return false; // Allow default handling
 	};
 
@@ -220,8 +269,23 @@ export default function TextInput({
 			return;
 		}
 
+		// Reset history index when typing regular characters
+		if (
+			input &&
+			!key.ctrl &&
+			!key.meta &&
+			!key.return &&
+			!key.upArrow &&
+			!key.downArrow
+		) {
+			setHistoryIndex(-1);
+			setTempInput('');
+		}
+
 		if (shouldSubmit) {
 			onSubmit && onSubmit(value);
+			setHistoryIndex(-1);
+			setTempInput('');
 		} else {
 			setCursorPosition(newCursorPosition);
 			onChange && onChange(newValue);
