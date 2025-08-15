@@ -8,8 +8,9 @@ import { HistoryMessage } from './components/history-message.jsx';
 import { CliMessage } from './components/cli-message.jsx';
 import TextInput from './components/text-input.jsx';
 import ToolSelection from './components/tool-selection.jsx';
+import { Welcome } from './components/welcome.jsx';
 
-export default function ChatApp({ config = {} }) {
+export default function ChatApp({ config = {}, logMessages }) {
 	const {
 		messages,
 		currentInput,
@@ -54,18 +55,40 @@ export default function ChatApp({ config = {} }) {
 		);
 	}
 
+	const headers = [
+		{ role: 'system', content: <Welcome /> },
+		...logMessages.map((log) => ({
+			role: 'system',
+			content: <Text>{log}</Text>,
+		})),
+	];
+
 	return (
 		<Box flexDirection="column" gap={0}>
 			{/* Message history */}
 			<Box marginBottom={1} minWidth={120}>
-				<Static items={messages}>
-					{(item, index) => (
-						<HistoryMessage
-							key={`${item.role}-${index}`}
-							message={item}
-							index={index}
-						/>
-					)}
+				<Static items={[...headers, ...messages]}>
+					{(item, index) => {
+						if (index < headers.length) {
+							return (
+								<Box
+									key={`${item.role}-${index}`}
+									marginBottom={index === headers.length - 1 ? 1 : 0}
+									paddingLeft={1}
+								>
+									{item.content}
+								</Box>
+							);
+						} else {
+							return (
+								<HistoryMessage
+									key={`${item.role}-${index}`}
+									message={item}
+									index={index}
+								/>
+							);
+						}
+					}}
 				</Static>
 				{streamingMessage && (
 					<AIMessage

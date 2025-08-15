@@ -40,22 +40,15 @@ const cli = meow(
 	}
 );
 
-function printWelcome() {
-	console.log('');
-	console.log('  Chat CLI - 0.2.0');
-	console.log('');
-}
-
 async function main() {
 	const quiet = Boolean(cli.flags.prompt);
-	if (!quiet) {
-		printWelcome();
-	}
 
 	const config = await loadConfig();
-	await loadExternalCommands({ quiet });
-	await loadPrompt({ quiet });
-	await initMcp({ config, quiet });
+	const logMessages = [];
+
+	await loadExternalCommands({ quiet, logMessages });
+	await loadPrompt({ quiet, logMessages });
+	await initMcp({ config, logMessages, quiet });
 
 	// CLI mode - skip welcome message and direct prompt
 	if (cli.flags.prompt) {
@@ -81,7 +74,12 @@ async function main() {
 		printConfig(config);
 	}
 
-	render(React.createElement(App, { config: { ...config, ...cli.flags } }));
+	render(
+		React.createElement(App, {
+			config: { ...config, ...cli.flags },
+			logMessages,
+		})
+	);
 }
 
 main();

@@ -1,7 +1,7 @@
 import { experimental_createMCPClient } from 'ai';
 import { Experimental_StdioMCPTransport } from 'ai/mcp-stdio';
 
-export async function initMcp({ config, quiet }) {
+export async function initMcp({ config, logMessages, quiet }) {
 	try {
 		let tools = {};
 		const { mcpServers = {} } = config;
@@ -20,19 +20,19 @@ export async function initMcp({ config, quiet }) {
 				});
 				const toolSet = await client.tools();
 				if (process.env.DEBUG === '1') {
-					console.log('load mcp tools:', Object.keys(toolSet));
+					logMessages.push('load mcp tools:', Object.keys(toolSet));
 				}
 				tools = { ...tools, ...toolSet };
 			}
 		}
 
 		if (!quiet && Object.keys(tools).length) {
-			console.log(`  Loaded ${Object.keys(tools).length} Mcp.\n`);
+			logMessages.push(`  Loaded ${Object.keys(tools).length} Mcp.\n`);
 		}
 
 		config.tools = tools;
 	} catch (err) {
 		if (!quiet)
-			console.log('Invalid mcpServers', err.message, config.mcpServers);
+			logMessages.push('Invalid mcpServers', err.message, config.mcpServers);
 	}
 }

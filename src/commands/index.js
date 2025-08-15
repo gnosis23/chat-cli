@@ -67,7 +67,11 @@ function createCustomFunc(fileContent, commandName) {
 	};
 }
 
-export async function loadExternalCommands({ quiet, customDirs = [] }) {
+export async function loadExternalCommands({
+	quiet,
+	logMessages,
+	customDirs = [],
+}) {
 	try {
 		// Default commands directory
 		const defaultCommandsDir = path.join(os.homedir(), '.chat-cli', 'commands');
@@ -117,27 +121,23 @@ export async function loadExternalCommands({ quiet, customDirs = [] }) {
 
 					loadedCount++;
 					if (!quiet)
-						console.log(
+						logMessages.push(
 							chalk.dim(
 								`  Loaded external command: ${commandName} (${commandsDir})`
 							)
 						);
 				} catch (error) {
 					if (!quiet)
-						console.error(
+						logMessages.push(
 							`  Error loading external command ${commandName} from ${commandsDir}:`,
 							error.message
 						);
 				}
 			}
 		}
-
-		if (loadedCount > 0) {
-			if (!quiet) console.log('');
-		}
 	} catch (error) {
 		if (!quiet)
-			console.error('Error loading external commands:', error.message);
+			logMessages.push('Error loading external commands:', error.message);
 	}
 }
 

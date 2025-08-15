@@ -140,9 +140,7 @@ assistant: The chat input logic is primarily handled in:
 let globalPrompt = null;
 let projectPrompt = null;
 
-export async function loadPrompt({ quiet }) {
-	let loaded = false;
-
+export async function loadPrompt({ quiet, logMessages }) {
 	try {
 		// load global config file: $HOME/.chat-cli.md
 		const homeConfigPath = path.resolve(process.env.HOME, '.chat-cli.md');
@@ -151,8 +149,7 @@ export async function loadPrompt({ quiet }) {
 			const markdown = await fs.readFile(homeConfigPath, 'utf8');
 			globalPrompt = markdown.toString();
 			if (!quiet)
-				console.log(chalk.dim('  Loaded global config: ~/.chat-cli.md'));
-			loaded = true;
+				logMessages.push(chalk.dim('  Loaded global config: ~/.chat-cli.md'));
 		} catch (error) {
 			// File doesn't exist, ignore
 		}
@@ -164,16 +161,13 @@ export async function loadPrompt({ quiet }) {
 			const markdown = await fs.readFile(absolutePath, 'utf8');
 			projectPrompt = markdown.toString();
 			if (!quiet)
-				console.log(chalk.dim('  Loaded project config: .chat-cli.md'));
-			loaded = true;
+				logMessages.push(chalk.dim('  Loaded project config: .chat-cli.md'));
 		} catch (error) {
 			// File doesn't exist, ignore
 		}
-
-		if (!quiet && loaded) console.log('');
 	} catch (error) {
 		// Handle any unexpected errors
-		if (!quiet) console.error('Error loading prompts:', error.message);
+		if (!quiet) logMessages.push('Error loading prompts:', error.message);
 	}
 }
 
